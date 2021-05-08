@@ -29,9 +29,10 @@ namespace TqkLibrary.WinApi
       using (Process curProcess = Process.GetCurrentProcess())
       using (ProcessModule curModule = curProcess.MainModule)
       {
-        using (var ModuleHandle = Kernel32.GetModuleHandle(curModule.ModuleName))
+        IntPtr ModuleHandle = Kernel32.GetModuleHandle(curModule.ModuleName);
+        if (ModuleHandle != IntPtr.Zero)
         {
-          WindowsHookExHandle = User32.SetWindowsHookEx(User32.WindowsHookType.WH_KEYBOARD_LL, windowsHook, ModuleHandle.DangerousGetHandle(), 0);
+          WindowsHookExHandle = User32.SetWindowsHookEx(User32.WindowsHookType.WH_KEYBOARD_LL, windowsHook, ModuleHandle, 0);
           handle = WindowsHookExHandle.DangerousGetHandle();
         }
       }
