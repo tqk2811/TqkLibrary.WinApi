@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462;net48</TargetFrameworks>
+    <TargetFrameworks>net462;net5.0-windows</TargetFrameworks>
     <LangVersion>8.0</LangVersion>
     <Platforms>AnyCPU</Platforms>
     <SignAssembly>true</SignAssembly>
@@ -16,7 +16,7 @@
     <PackageReference Include="System.Management" Version="5.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System.Windows" />
@@ -24,5 +24,10 @@
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
-
+  
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net5'))">
+    <FrameworkReference Include="Microsoft.NETCore.App" />
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" />
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App.WPF" />
+  </ItemGroup>
 </Project>
