@@ -54,26 +54,6 @@ namespace TqkLibrary.WinApi
       return null;
     }
 
-    public Bitmap ScreenShot2()
-    {
-      if (User32.GetWindowRect(TopWindowHandle, out RECT windowRect))
-      {
-        int width = windowRect.right - windowRect.left;
-        int height = windowRect.bottom - windowRect.top;
-        if (windowSize.Width != width && windowSize.Height != height)
-        {
-          User32.SetWindowPos(
-            TopWindowHandle,
-            IntPtr.Zero,
-            windowRect.left, windowRect.top,
-            windowSize.Width, windowSize.Height, User32.SetWindowPosFlags.SWP_SHOWWINDOW);
-          Task.Delay(100).Wait();
-        }
-        return TopWindowHandle.CaptureWindow2();
-      }
-      return null;
-    }
-
     public void Tap(Point point,int delay = 50, int fixTop = 34)
     {
       BindWindowHandle.ControlLClick(point.X, point.Y - fixTop, delay);
