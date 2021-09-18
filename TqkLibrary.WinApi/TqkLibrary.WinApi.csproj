@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net462;net5.0-windows</TargetFrameworks>
-    <LangVersion>8.0</LangVersion>
+    <TargetFrameworks>net462;net5.0-windows;net6.0-windows</TargetFrameworks>
+    <LangVersion Condition="!$(TargetFramework.StartsWith('net6'))">8.0</LangVersion>
+    <LangVersion Condition="$(TargetFramework.StartsWith('net6'))">10.0</LangVersion>
     <Platforms>AnyCPU</Platforms>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Key.pfx</AssemblyOriginatorKeyFile>
@@ -25,7 +26,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net5'))">
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net5')) Or $(TargetFramework.StartsWith('net6'))">
     <FrameworkReference Include="Microsoft.NETCore.App" />
     <FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" />
     <FrameworkReference Include="Microsoft.WindowsDesktop.App.WPF" />
