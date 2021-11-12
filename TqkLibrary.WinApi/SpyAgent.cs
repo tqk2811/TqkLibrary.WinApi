@@ -72,7 +72,7 @@ namespace TqkLibrary.WinApi
       hookKeys.KeyCode.Add(keycodeSelect);
       hookKeys.KeyCode.Add(keycodeExit);
       hookKeys.Callback += HookKeys_Callback;
-
+      hookKeys.HookAll = false;
       _timer = new System.Windows.Forms.Timer { Interval = 200, Enabled = false };
       _timer.Tick += OnTimerTicked;
     }
@@ -112,8 +112,9 @@ namespace TqkLibrary.WinApi
       hookKeys.SetupHook();
     }
 
-    private void HookKeys_Callback(int keycode)
+    private void HookKeys_Callback(int keycode,bool isDown)
     {
+      if (!isDown) return;
       if (SpiedWindowSelected == null) return;
       if (keycode == keycodeExit) EndSpying();
       else if (keycode == keycodeSelect) SpiedWindowSelected(this, GetHoveredWindow());

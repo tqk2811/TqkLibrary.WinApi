@@ -24,11 +24,13 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   
   <ItemGroup Condition="$(TargetFramework.StartsWith('net5')) Or $(TargetFramework.StartsWith('net6'))">
     <FrameworkReference Include="Microsoft.NETCore.App" />
     <FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" />
     <FrameworkReference Include="Microsoft.WindowsDesktop.App.WPF" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
 </Project>

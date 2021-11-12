@@ -7,10 +7,11 @@ using System.Runtime.InteropServices;
 
 namespace TqkLibrary.WinApi
 {
-  public delegate void HookCallBack(int keycode);
+  public delegate void HookCallBack(int keycode,bool isDown);
 
   public class HookKeys
   {
+    public bool HookAll { get; set; } = false;
     public List<int> KeyCode { get; } = new List<int>();
 
     public event HookCallBack Callback;
@@ -50,14 +51,14 @@ namespace TqkLibrary.WinApi
 
     private int HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
     {
-      if (nCode >= 0 && wParam == (IntPtr)User32.WindowMessage.WM_KEYDOWN)
+      if(nCode >= 0 && (
+        wParam == (IntPtr)User32.WindowMessage.WM_KEYDOWN ||
+        wParam == (IntPtr)User32.WindowMessage.WM_KEYUP))
       {
+        bool keyDown = wParam == (IntPtr)User32.WindowMessage.WM_KEYDOWN;
         int vkCode = Marshal.ReadInt32(lParam);
-        if (KeyCode.Count > 0)
-        {
-          if (KeyCode.Any(x => x == vkCode)) Callback?.Invoke(vkCode);
-        }
-        else Callback?.Invoke(vkCode);
+        if (HookAll) Callback?.Invoke(vkCode, keyDown);
+        else if (KeyCode.Any(x => x == vkCode)) Callback?.Invoke(vkCode, keyDown);
       }
       return User32.CallNextHookEx(handle, nCode, wParam, lParam);
     }

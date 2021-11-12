@@ -36,7 +36,12 @@ namespace TqkLibrary.WinApi
       User32.SendMessage(windowHandle, User32.WindowMessage.WM_LBUTTONUP, new IntPtr(MK_LBUTTON), Helpers.CreateLParam(x, y));
     }
 
-
+    /// <summary>
+    /// https://keycode.info/
+    /// </summary>
+    /// <param name="windowHandle"></param>
+    /// <param name="chr"></param>
+    /// <exception cref="NotSupportedException"></exception>
     public static void SendKey(this IntPtr windowHandle, char chr)
     {
       bool isShift = false;
@@ -54,8 +59,27 @@ namespace TqkLibrary.WinApi
       {
         key = chr;
       }
-      else throw new NotSupportedException(chr.ToString());
+      else
+      {
+        switch(chr)
+        {
+          case '.':
+            {
+              key = (int)User32.VirtualKey.VK_OEM_PERIOD;
+              break;
+            }
 
+          case '_':
+            {
+              key = (int)User32.VirtualKey.VK_OEM_MINUS;
+              isShift = true;
+              break;
+            }
+
+          default:
+            throw new NotSupportedException(chr.ToString());
+        }
+      }
 
       User32.SendMessage(windowHandle, User32.WindowMessage.WM_KEYDOWN, new IntPtr((uint)key), IntPtr.Zero);
       if(isShift) User32.SendMessage(windowHandle, User32.WindowMessage.WM_KEYDOWN, new IntPtr((uint)User32.VirtualKey.VK_SHIFT), IntPtr.Zero);
