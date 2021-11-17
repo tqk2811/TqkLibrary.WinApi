@@ -57,8 +57,9 @@ namespace TqkLibrary.WinApi
     }
   }
 
-  public class SpyAgent
+  public class SpyAgent<T> where T : class
   {
+    public T Data { get; private set; }
     private readonly System.Windows.Forms.Timer _timer;
     private SpyAgentLocator _locator;
     private readonly int keycodeSelect;
@@ -101,8 +102,9 @@ namespace TqkLibrary.WinApi
       _locator.Show();
     }
 
-    public void BeginSpying()
+    public void BeginSpying(T t)
     {
+      this.Data = t;
       _locator?.Close();
       _locator?.Dispose();
       _locator = new SpyAgentLocator();
@@ -117,7 +119,7 @@ namespace TqkLibrary.WinApi
       if (!isDown) return;
       if (SpiedWindowSelected == null) return;
       if (keycode == keycodeExit) EndSpying();
-      else if (keycode == keycodeSelect) SpiedWindowSelected(this, GetHoveredWindow());
+      else if (keycode == keycodeSelect) SpiedWindowSelected?.Invoke(this, GetHoveredWindow());
     }
 
     public void EndSpying()
@@ -127,6 +129,7 @@ namespace TqkLibrary.WinApi
       _locator?.Close();
       _locator?.Dispose();
       _locator = null;
+      this.Data = null;
     }
 
     private class SpyAgentLocator : Form
