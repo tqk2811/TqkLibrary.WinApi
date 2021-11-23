@@ -2,10 +2,8 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>net462;net5.0-windows;net6.0-windows</TargetFrameworks>
-		<LangVersion Condition="!$(TargetFramework.StartsWith('net6'))">8.0</LangVersion>
-		<LangVersion Condition="$(TargetFramework.StartsWith('net6'))">10.0</LangVersion>
+		<LangVersion >8.0</LangVersion>
 		<Platforms>AnyCPU</Platforms>
-		<SignAssembly>true</SignAssembly>
 		<UseWPF>true</UseWPF>
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyOriginatorKeyFile>Key.pfx</AssemblyOriginatorKeyFile>
