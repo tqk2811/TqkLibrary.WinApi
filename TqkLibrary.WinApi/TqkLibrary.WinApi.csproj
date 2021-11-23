@@ -1,36 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFrameworks>net462;net5.0-windows;net6.0-windows</TargetFrameworks>
-    <LangVersion Condition="!$(TargetFramework.StartsWith('net6'))">8.0</LangVersion>
-    <LangVersion Condition="$(TargetFramework.StartsWith('net6'))">10.0</LangVersion>
-    <Platforms>AnyCPU</Platforms>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>Key.pfx</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net462;net5.0-windows;net6.0-windows</TargetFrameworks>
+		<LangVersion Condition="!$(TargetFramework.StartsWith('net6'))">8.0</LangVersion>
+		<LangVersion Condition="$(TargetFramework.StartsWith('net6'))">10.0</LangVersion>
+		<Platforms>AnyCPU</Platforms>
+		<SignAssembly>true</SignAssembly>
+		<UseWPF>true</UseWPF>
+		<UseWindowsForms>true</UseWindowsForms>
+		<AssemblyOriginatorKeyFile>Key.pfx</AssemblyOriginatorKeyFile>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="PInvoke.Gdi32" Version="0.7.104" />
-    <PackageReference Include="PInvoke.Kernel32" Version="0.7.104" />
-    <PackageReference Include="PInvoke.User32" Version="0.7.104" />
-    <PackageReference Include="PInvoke.Windows.Core" Version="0.7.104" />
-    <PackageReference Include="System.Management" Version="5.0.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System.Windows" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="System.Drawing" />
-  </ItemGroup>
-  
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net5')) Or $(TargetFramework.StartsWith('net6'))">
-    <FrameworkReference Include="Microsoft.NETCore.App" />
-    <FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" />
-    <FrameworkReference Include="Microsoft.WindowsDesktop.App.WPF" />
-    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="PInvoke.Gdi32" Version="0.7.104" />
+		<PackageReference Include="PInvoke.Kernel32" Version="0.7.104" />
+		<PackageReference Include="PInvoke.User32" Version="0.7.104" />
+		<PackageReference Include="PInvoke.Windows.Core" Version="0.7.104" />
+		<PackageReference Include="System.Management" Version="6.0.0" />
+		<PackageReference Include="System.Drawing.Common" Version="6.0.0" />
+	</ItemGroup>
 </Project>
