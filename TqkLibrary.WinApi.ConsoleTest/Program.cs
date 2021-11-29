@@ -6,27 +6,26 @@ using System.Threading.Tasks;
 
 namespace TqkLibrary.WinApi.ConsoleTest
 {
-  class Program
-  {
-    static void Main(string[] args)
+    class Program
     {
-      IntPtr handle = new IntPtr(5377338);//BindWindowHandle
-      //
-
-      IntPtr handle2 = new IntPtr(985282);//TopWindowHandle
-      while (true)
-      {
-        //handle.ControlLClick(220, 65);
-        foreach(char c in "TeSt23")
+        static void Main(string[] args)
         {
-          handle.SendKey(c);
-        }
-        
-        //handle2.CaptureWindow().Save("D:\\test.png");
+            IntPtr BindWindowHandle = new IntPtr(0xc077e);//BindWindowHandle
+            IntPtr TopWindowHandle = new IntPtr(0x909e0);//TopWindowHandle
+            LdPlayerHelper ldPlayerHelper = new LdPlayerHelper(TopWindowHandle, BindWindowHandle);
+            while (true)
+            {
+                //BindWindowHandle.ControlLClick(220, 65);
+                //foreach(char c in "TeSt23")
+                //{
+                //  BindWindowHandle.SendKey(c);
+                //}
 
-        Console.ReadLine();
-      }
-      
+                ldPlayerHelper.ScreenShot(ScreenShotType.BitBlt).Save("D:\\test.png");
+
+                Console.ReadLine();
+            }
+
+        }
     }
-  }
 }
