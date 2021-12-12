@@ -48,6 +48,7 @@ namespace TqkLibrary.WinApi
             return false;
         }
 
+        //https://stackoverflow.com/questions/5069104/fastest-method-of-screen-capturing-on-windows
         public Bitmap ScreenShot(ScreenShotType type)
         {
             if (User32.GetWindowRect(TopWindowHandle, out RECT windowRect))// get the size
