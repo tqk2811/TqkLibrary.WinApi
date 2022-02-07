@@ -8,6 +8,10 @@
 		<UseWindowsForms>true</UseWindowsForms>
 		<AssemblyOriginatorKeyFile>Key.pfx</AssemblyOriginatorKeyFile>
 		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<PreserveCompilationContext>false</PreserveCompilationContext>
+		<GenerateDependencyFile>false</GenerateDependencyFile>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
