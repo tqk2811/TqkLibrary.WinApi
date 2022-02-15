@@ -8,6 +8,7 @@
 		<authors>tqk2811</authors>
 		<projectUrl>https://github.com/tqk2811/TqkLibrary.WinApi</projectUrl>
 		<repository type="git" url="https://github.com/tqk2811/TqkLibrary.WinApi.git"/>
+		<license type="expression">MIT</license>
 		<dependencies>
 			<dependency id="PInvoke.Gdi32" version="0.7.104" />
 			<dependency id="PInvoke.Kernel32" version="0.7.104" />
