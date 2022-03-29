@@ -80,7 +80,7 @@ namespace TqkLibrary.WinApi
               wParam == (IntPtr)User32.WindowMessage.WM_KEYUP ||
               wParam == (IntPtr)User32.WindowMessage.WM_SYSKEYDOWN))
             {
-                bool keyDown = wParam == (IntPtr)User32.WindowMessage.WM_KEYDOWN;
+                bool keyDown = wParam == (IntPtr)User32.WindowMessage.WM_KEYDOWN || wParam == (IntPtr)User32.WindowMessage.WM_SYSKEYDOWN;
                 int vkCode = Marshal.ReadInt32(lParam);
                 if (HookAll) Callback?.Invoke(vkCode, keyDown);
                 else if (KeyCode.Any(x => x == vkCode)) Callback?.Invoke(vkCode, keyDown);
