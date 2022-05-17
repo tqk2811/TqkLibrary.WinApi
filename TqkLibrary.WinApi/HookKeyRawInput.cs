@@ -4,23 +4,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace TqkLibrary.WinApi
 {
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="keycode"></param>
-    /// <param name="isDown"></param>
-    public delegate void HookCallBack(int keycode, bool isDown);
-    /// <summary>
-    /// 
-    /// </summary>
-    public class HookKeys
-    {
-        /// <summary>
-        /// 
-        /// </summary>
+    public class HookKeyRawInput
+    {/// <summary>
+     /// 
+     /// </summary>
         public bool HookAll { get; set; } = false;
 
         /// <summary>
@@ -40,7 +35,7 @@ namespace TqkLibrary.WinApi
         /// <summary>
         /// 
         /// </summary>
-        public HookKeys()
+        public HookKeyRawInput()
         {
             windowsHook = HookCallback;//make that delegate not release by GC
         }
@@ -82,8 +77,8 @@ namespace TqkLibrary.WinApi
             {
                 bool keyDown = wParam == (IntPtr)User32.WindowMessage.WM_KEYDOWN || wParam == (IntPtr)User32.WindowMessage.WM_SYSKEYDOWN;
                 int vkCode = Marshal.ReadInt32(lParam);
-                if (HookAll) ThreadPool.QueueUserWorkItem((o) => Callback?.Invoke(vkCode, keyDown));
-                else if (KeyCode.Any(x => x == vkCode)) ThreadPool.QueueUserWorkItem((o) => Callback?.Invoke(vkCode, keyDown));
+                if (HookAll) Callback?.Invoke(vkCode, keyDown);
+                else if (KeyCode.Any(x => x == vkCode)) Callback?.Invoke(vkCode, keyDown);
             }
             return User32.CallNextHookEx(handle, nCode, wParam, lParam);
         }
