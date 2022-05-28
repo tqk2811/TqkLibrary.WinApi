@@ -10,24 +10,45 @@ using System.Windows.Input;
 
 namespace TqkLibrary.WinApi
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public enum ScreenShotType
     {
+        /// <summary>
+        /// 
+        /// </summary>
         PrintWindow,
+        /// <summary>
+        /// 
+        /// </summary>
         BitBlt,
         //DesktopDuplicationAPI
     }
+    /// <summary>
+    /// 
+    /// </summary>
     public class LdPlayerHelper
     {
         const int Srccopy = 0x00CC0020;
 
         readonly IntPtr TopWindowHandle;
         readonly IntPtr BindWindowHandle;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="TopWindowHandle"></param>
+        /// <param name="BindWindowHandle"></param>
         public LdPlayerHelper(IntPtr TopWindowHandle, IntPtr BindWindowHandle)
         {
             this.TopWindowHandle = TopWindowHandle;
             this.BindWindowHandle = BindWindowHandle;
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="size"></param>
+        /// <returns></returns>
         public bool Resize(Size size)
         {
             if (User32.GetWindowRect(TopWindowHandle, out RECT windowRect))
@@ -49,6 +70,12 @@ namespace TqkLibrary.WinApi
         }
 
         //https://stackoverflow.com/questions/5069104/fastest-method-of-screen-capturing-on-windows
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public Bitmap ScreenShot(ScreenShotType type)
         {
             if (User32.GetWindowRect(TopWindowHandle, out RECT windowRect))// get the size
@@ -64,10 +91,10 @@ namespace TqkLibrary.WinApi
                             IntPtr hdc = fgx.GetHdc();
                             bool flag = User32.PrintWindow(TopWindowHandle, hdc, User32.PrintWindowFlags.PW_FULLWINDOW);
                             fgx.ReleaseHdc(hdc);
-                            if(flag) return bitmap;
+                            if (flag) return bitmap;
                             else
                             {
-                                using(var bm = bitmap) return null;
+                                using (var bm = bitmap) return null;
                             }
                         }
 
@@ -75,12 +102,12 @@ namespace TqkLibrary.WinApi
                         {
                             // get te hDC of the target window
                             using var hdcSrc = User32.GetWindowDC(TopWindowHandle);
-                            if (hdcSrc.IsInvalid) 
+                            if (hdcSrc.IsInvalid)
                                 return null;
 
                             // create a device context we can copy to
                             using var hdcDest = Gdi32.CreateCompatibleDC(hdcSrc);
-                            if (hdcDest.IsInvalid) 
+                            if (hdcDest.IsInvalid)
                                 return null;
 
                             // create a bitmap we can copy it to,
@@ -96,7 +123,7 @@ namespace TqkLibrary.WinApi
                                 if (result)
                                 {
                                     // restore selection
-                                    IntPtr obj = Gdi32.SelectObject(hdcDest, hOld);                                    
+                                    IntPtr obj = Gdi32.SelectObject(hdcDest, hOld);
                                     //ReleaseDC(TopWindowHandle, hdcSrc);//auto release by "using hdcSrc"
                                     return Image.FromHbitmap(hBitmap);
                                 }
@@ -112,22 +139,37 @@ namespace TqkLibrary.WinApi
                             }
                         }
 
-                    //case ScreenShotType.DesktopDuplicationAPI:
-                    //    {
+                        //case ScreenShotType.DesktopDuplicationAPI:
+                        //    {
 
-                    //        break;
-                    //    }
+                        //        break;
+                        //    }
                 }
             }
             return null;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="delay"></param>
+        /// <param name="fixTop"></param>
         public void Tap(Point point, int delay = 50, int fixTop = 34)
         {
             BindWindowHandle.ControlLClick(point.X, point.Y - fixTop, delay);
         }
 
         const uint MK_LBUTTON = 0x0001;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="time"></param>
+        /// <param name="step"></param>
+        /// <param name="fixTop"></param>
+        /// <param name="cancellationToken"></param>
         public void Swipe(Point from, Point to, int time, int step = 10, int fixTop = 34, CancellationToken cancellationToken = default)
         {
             int times = time / step;
@@ -156,7 +198,11 @@ namespace TqkLibrary.WinApi
             }
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="delay"></param>
         public void SendText(string text, int delay = 10)
         {
             foreach (char c in text)
@@ -166,6 +212,59 @@ namespace TqkLibrary.WinApi
             }
         }
 
+        /// <summary>
+        /// for key code, try find at <see href="https://keycode.info/"/>
+        /// </summary>
+        /// <returns></returns>
+        public async Task SendTextAsync(string text, int delay = 10, CancellationToken cancellationToken = default)
+        {
+            foreach (char c in text)
+            {
+                BindWindowHandle.SendKey(c);
+                await Task.Delay(delay, cancellationToken);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void SendTextUnicode(string text, int delay = 10)
+        {
+            if (User32.IsWindowUnicode(BindWindowHandle))
+            {
+                foreach (char c in text)
+                {
+                    User32.SendMessage(BindWindowHandle, User32.WindowMessage.WM_CHAR, new IntPtr(c), IntPtr.Zero);
+                    Task.Delay(delay).Wait();
+                }
+            }
+            else throw new NotSupportedException("This process not support unicode");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="delay"></param>
+        /// <param name="cancellationToken"></param>
+        /// <exception cref="NotSupportedException"></exception>
+        public async Task SendTextUnicodeAsync(string text, int delay = 10, CancellationToken cancellationToken = default)
+        {
+            if (User32.IsWindowUnicode(BindWindowHandle))
+            {
+                foreach (char c in text)
+                {
+                    User32.SendMessage(BindWindowHandle, User32.WindowMessage.WM_CHAR, new IntPtr(c), IntPtr.Zero);
+                    await Task.Delay(delay, cancellationToken);
+                }
+            }
+            else throw new NotSupportedException("This process not support unicode");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
         public void Key(int key)
         {
             User32.SendMessage(BindWindowHandle, User32.WindowMessage.WM_KEYDOWN, new IntPtr(key), IntPtr.Zero);
