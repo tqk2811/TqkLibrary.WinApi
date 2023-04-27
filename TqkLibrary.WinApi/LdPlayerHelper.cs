@@ -116,7 +116,7 @@ namespace TqkLibrary.WinApi
                             IntPtr hOld = Gdi32.SelectObject(hdcDest, hBitmap);
 
                             // bitblt over
-                            bool result = Gdi32.BitBlt(hdcDest.DangerousGetHandle(), 0, 0, width, height, hdcSrc.DangerousGetHandle(), 0, 0, Srccopy);
+                            bool result = Gdi32.BitBlt(hdcDest, 0, 0, width, height, hdcSrc, 0, 0, Srccopy);
 
                             try
                             {
