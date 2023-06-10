@@ -12,7 +12,7 @@ namespace TqkLibrary.WinApi.ConsoleTest
         {
             IntPtr BindWindowHandle = new IntPtr(0xc077e);//BindWindowHandle
             IntPtr TopWindowHandle = new IntPtr(0x909e0);//TopWindowHandle
-            LdPlayerHelper ldPlayerHelper = new LdPlayerHelper(TopWindowHandle, BindWindowHandle);
+            LdPlayerAndroidEmulatorHelper ldPlayerHelper = new LdPlayerAndroidEmulatorHelper(TopWindowHandle, BindWindowHandle);
             while (true)
             {
                 //BindWindowHandle.ControlLClick(220, 65);
@@ -21,7 +21,7 @@ namespace TqkLibrary.WinApi.ConsoleTest
                 //  BindWindowHandle.SendKey(c);
                 //}
 
-                ldPlayerHelper.ScreenShot(ScreenShotType.BitBlt).Save("D:\\test.png");
+                ldPlayerHelper.ScreenShot(CaptureType.BitBlt).Save("D:\\test.png");
 
                 Console.ReadLine();
             }
