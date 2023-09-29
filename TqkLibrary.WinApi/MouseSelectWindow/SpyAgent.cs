@@ -39,7 +39,6 @@ namespace TqkLibrary.WinApi
         public SpyAgent(SynchronizationContext synchronizationContext)
         {
             this._synchronizationContext = synchronizationContext;
-            _mouseHook.MouseAction += _mouseHook_MouseAction;
         }
 
         /// <summary>
@@ -73,6 +72,7 @@ namespace TqkLibrary.WinApi
 
                 _mouseHook?.Dispose();
                 _mouseHook = new MouseHook();
+                _mouseHook.MouseAction += _mouseHook_MouseAction;
             },
             null);
         }
