@@ -73,6 +73,7 @@ namespace TqkLibrary.WinApi
                 _mouseHook?.Dispose();
                 _mouseHook = new MouseHook();
                 _mouseHook.MouseAction += _mouseHook_MouseAction;
+                _mouseHook.SetupHook();
             },
             null);
         }
