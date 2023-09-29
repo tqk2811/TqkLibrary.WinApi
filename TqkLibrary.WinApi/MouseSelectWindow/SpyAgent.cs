@@ -106,6 +106,7 @@ namespace TqkLibrary.WinApi
 
                 case User32.WindowMessage.WM_LBUTTONDOWN:
                     SpiedWindowSelected?.Invoke(this, GetHoveredWindow());
+                    EndSpying();
                     break;
 
                 case User32.WindowMessage.WM_RBUTTONDOWN:
