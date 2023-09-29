@@ -3,6 +3,7 @@ using System;
 using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
+using TqkLibrary.WinApi.Enums;
 
 namespace TqkLibrary.WinApi.HandleControls
 {

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TqkLibrary.WinApi.Enums;
+using TqkLibrary.WinApi.HandleControls;
 
 namespace TqkLibrary.WinApi.ConsoleTest
 {
@@ -21,7 +23,7 @@ namespace TqkLibrary.WinApi.ConsoleTest
                 //  BindWindowHandle.SendKey(c);
                 //}
 
-                ldPlayerHelper.ScreenShot(CaptureType.BitBlt).Save("D:\\test.png");
+                //ldPlayerHelper.ScreenShot(CaptureType.BitBlt).Save("D:\\test.png");
 
                 Console.ReadLine();
             }
