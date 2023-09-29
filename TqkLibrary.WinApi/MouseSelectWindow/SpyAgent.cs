@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
+using TqkLibrary.WinApi.HookEvents;
 using TqkLibrary.WinApi.PInvokeAdv.Api;
 
 namespace TqkLibrary.WinApi
@@ -11,110 +13,123 @@ namespace TqkLibrary.WinApi
     /// <summary>
     /// 
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class SpyAgent<T> where T : class
+    public partial class SpyAgent : IDisposable
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public T Data { get; private set; }
-        private readonly System.Windows.Forms.Timer _timer;
-        private SpyAgentLocator _locator;
-        private readonly int keycodeSelect;
-        private readonly int keycodeExit;
-        /// <summary>
-        /// 
-        /// </summary>
-        public readonly HookKeys hookKeys = new HookKeys();
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="keycodeSelect"></param>
-        /// <param name="keycodeExit"></param>
-        public SpyAgent(int keycodeSelect = 'S', int keycodeExit = 27)
-        {
-            this.keycodeSelect = keycodeSelect;
-            this.keycodeExit = keycodeExit;
-            hookKeys.KeyCode.Add(keycodeSelect);
-            hookKeys.KeyCode.Add(keycodeExit);
-            hookKeys.Callback += HookKeys_Callback;
-            hookKeys.HookAll = false;
-            _timer = new System.Windows.Forms.Timer { Interval = 200, Enabled = false };
-            _timer.Tick += OnTimerTicked;
-        }
         /// <summary>
         /// 
         /// </summary>
         public event EventHandler<SpiedWindow> SpiedWindowSelected;
 
-        private void OnTimerTicked(object sender, EventArgs e)
+        private readonly SynchronizationContext _synchronizationContext;
+        private MouseHook _mouseHook;
+        private SpyAgentLocator _locator;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public SpyAgent() : this(SynchronizationContext.Current)
         {
-            ShowLocator();
-        }
-
-        private void ShowLocator()
-        {
-            SpiedWindow window = GetHoveredWindow();
-
-            if (window.Handle == IntPtr.Zero)
-            {
-                _locator.Hide();
-                return;
-            }
-
-            _locator.Location = window.Area.Location;
-            _locator.Size = window.Area.Size;
-            _locator.TopLevel = true;
-            _locator.TopMost = true;
-            _locator.Show();
+            if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)
+                throw new InvalidOperationException($"Must be calling on STA thread");
         }
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="t"></param>
-        public void BeginSpying(T t)
+        /// <param name="synchronizationContext">requied for main thread sta</param>
+        public SpyAgent(SynchronizationContext synchronizationContext)
         {
-            this.Data = t;
-            _locator?.Close();
-            _locator?.Dispose();
-            _locator = new SpyAgentLocator();
-
-            MakePassThrough(_locator.Handle);
-            _timer.Enabled = true;
-            hookKeys.SetupHook();
+            this._synchronizationContext = synchronizationContext;
+            _mouseHook.MouseAction += _mouseHook_MouseAction;
         }
 
-        private void HookKeys_Callback(int keycode, bool isDown)
+        /// <summary>
+        /// 
+        /// </summary>
+        ~SpyAgent()
         {
-            if (!isDown) return;
-            if (SpiedWindowSelected == null) return;
-            if (keycode == keycodeExit) EndSpying();
-            else if (keycode == keycodeSelect) SpiedWindowSelected?.Invoke(this, GetHoveredWindow());
+            EndSpying();
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+            EndSpying();
+            GC.SuppressFinalize(this);
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual void BeginSpying()
+        {
+            _synchronizationContext.Post((o) =>
+            {
+                _locator?.Close();
+                _locator?.Dispose();
+                _locator = new SpyAgentLocator();
+                MakePassThrough(_locator.Handle);
+
+                _mouseHook?.Dispose();
+                _mouseHook = new MouseHook();
+            },
+            null);
+        }
+
         /// <summary>
         /// 
         /// </summary>
         public void EndSpying()
         {
-            _timer.Enabled = false;
-            hookKeys.UnHook();
-            _locator?.Close();
-            _locator?.Dispose();
-            _locator = null;
-            this.Data = null;
+            _synchronizationContext.Post((o) =>
+            {
+                _locator?.Close();
+                _locator?.Dispose();
+                _locator = null;
+
+                _mouseHook?.Dispose();
+                _mouseHook = null;
+            },
+            null);
         }
 
-        private class SpyAgentLocator : Form
+
+        private void _mouseHook_MouseAction(object sender, MouseHook.RawMouseEventArgs e)
         {
-            public SpyAgentLocator()
+            switch (e.Message)
             {
-                FormBorderStyle = FormBorderStyle.None;
-                BackColor = Color.OrangeRed;
-                Opacity = 0.25;
-                TopLevel = true;
-                TopMost = true;
-                ShowInTaskbar = false;
+                case User32.WindowMessage.WM_MOUSEMOVE:
+                    ShowLocator();
+                    break;
+
+                case User32.WindowMessage.WM_LBUTTONDOWN:
+                    SpiedWindowSelected?.Invoke(this, GetHoveredWindow());
+                    break;
+
+                case User32.WindowMessage.WM_RBUTTONDOWN:
+                    EndSpying();
+                    break;
             }
+        }
+
+        private void ShowLocator()
+        {
+            _synchronizationContext.Post((o) =>
+            {
+                SpiedWindow window = GetHoveredWindow();
+                if (window.Handle == IntPtr.Zero)
+                {
+                    _locator.Hide();
+                    return;
+                }
+                _locator.Location = window.Area.Location;
+                _locator.Size = window.Area.Size;
+                _locator.TopLevel = true;
+                _locator.TopMost = true;
+                _locator.Show();
+            },
+            null);
         }
 
         #region Under the Hood
@@ -133,7 +148,6 @@ namespace TqkLibrary.WinApi
             int exstyle = User32.GetWindowLong(handle, User32.WindowLongIndexFlags.GWL_EXSTYLE);
             User32.SetWindowLong(handle, User32.WindowLongIndexFlags.GWL_EXSTYLE, User32.SetWindowLongFlags.WS_EX_TRANSPARENT | (User32.SetWindowLongFlags)exstyle);
         }
-
         #endregion Under the Hood
     }
 }
