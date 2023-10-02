@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using TqkLibrary.WinApi.HookEvents;
 using TqkLibrary.WinApi.PInvokeAdv.Api;
@@ -94,9 +95,35 @@ namespace TqkLibrary.WinApi
             },
             null);
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Task EndSpyingAsync()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            _synchronizationContext.Post((o) =>
+            {
+                try
+                {
+                    _locator?.Close();
+                    _locator?.Dispose();
+                    _locator = null;
 
+                    _mouseHook?.Dispose();
+                    _mouseHook = null;
 
-        private void _mouseHook_MouseAction(object sender, MouseHook.RawMouseEventArgs e)
+                    tcs.TrySetResult(true);
+                }
+                catch (Exception e)
+                {
+                    tcs.TrySetException(e);
+                }
+            }, null);
+            return tcs.Task;
+        }
+
+        private async void _mouseHook_MouseAction(object sender, MouseHook.RawMouseEventArgs e)
         {
             switch (e.Message)
             {
@@ -105,8 +132,8 @@ namespace TqkLibrary.WinApi
                     break;
 
                 case User32.WindowMessage.WM_LBUTTONDOWN:
+                    try { await EndSpyingAsync(); } catch { }
                     SpiedWindowSelected?.Invoke(this, GetHoveredWindow());
-                    EndSpying();
                     break;
 
                 case User32.WindowMessage.WM_RBUTTONDOWN:
