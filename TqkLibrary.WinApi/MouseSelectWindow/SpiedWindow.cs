@@ -49,7 +49,7 @@ namespace TqkLibrary.WinApi
         /// <returns></returns>
         public SpiedWindow GetParentWindow()
         {
-            return new SpiedWindow(MyUser32.GetParent(Handle));
+            return new SpiedWindow(User32.GetParent(Handle));
         }
         /// <summary>
         /// 
@@ -66,7 +66,7 @@ namespace TqkLibrary.WinApi
         public IEnumerable<SpiedWindow> GetChildren()
         {
             var children = new List<SpiedWindow>();
-            MyUser32.EnumChildWindows(Handle, (hWnd, lp) =>
+            User32.EnumChildWindows(Handle, (hWnd, lp) =>
             {
                 children.Add(new SpiedWindow(hWnd));
                 return true;
