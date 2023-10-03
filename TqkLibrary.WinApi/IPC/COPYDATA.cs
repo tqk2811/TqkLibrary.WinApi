@@ -7,21 +7,44 @@ using TqkLibrary.WinApi.PInvokeAdv.Api;
 
 namespace TqkLibrary.WinApi.IPC
 {
-  public static class COPYDATA
-  {
-    public static Win32ErrorCode EnableWM_CopyData(IntPtr windowHandle)
+    /// <summary>
+    /// 
+    /// </summary>
+    public static class COPYDATA
     {
-      CHANGEFILTERSTRUCT changeFilter = new CHANGEFILTERSTRUCT();
-      changeFilter.size = (uint)Marshal.SizeOf(changeFilter);
-      changeFilter.info = 0;
-      if (!MyUser32.ChangeWindowMessageFilterEx(windowHandle, User32.WindowMessage.WM_COPYDATA, ChangeWindowMessageFilterExAction.Allow, ref changeFilter)) return Kernel32.GetLastError();
-      else return Win32ErrorCode.ERROR_SUCCESS;
-    }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="windowHandle"></param>
+        /// <returns></returns>
+        public static unsafe Win32ErrorCode EnableWM_CopyData(IntPtr windowHandle)
+        {
+            User32.CHANGEFILTERSTRUCT? changeFilter = new User32.CHANGEFILTERSTRUCT()
+            {
+                cbSize = (uint)sizeof(User32.CHANGEFILTERSTRUCT),
+                ExtStatus = 0
+            };
 
-    public static void Init_WndProc(System.Windows.Window window, HwndSourceHook hwndSourceHook)
-    {
-      HwndSource source = PresentationSource.FromVisual(window) as HwndSource;
-      source.AddHook(hwndSourceHook);
+            Kernel32.SetLastError((uint)Win32ErrorCode.ERROR_SUCCESS);
+
+            User32.ChangeWindowMessageFilterEx(
+                windowHandle,
+                (uint)User32.WindowMessage.WM_COPYDATA,
+                (uint)ChangeWindowMessageFilterExAction.Allow,
+                ref changeFilter);
+
+            return Kernel32.GetLastError();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="window"></param>
+        /// <param name="hwndSourceHook"></param>
+        public static void Init_WndProc(System.Windows.Window window, HwndSourceHook hwndSourceHook)
+        {
+            HwndSource source = PresentationSource.FromVisual(window) as HwndSource;
+            source.AddHook(hwndSourceHook);
+        }
     }
-  }
 }
