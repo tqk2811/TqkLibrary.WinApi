@@ -48,7 +48,26 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
-        public string Title { get { return User32.GetWindowText(WindowHandle); } }
+        public string Title
+        {
+            get
+            {
+                int maxLength = User32.GetWindowTextLength(WindowHandle);
+                if (maxLength == 0)
+                {
+                    return string.Empty;
+                }
+
+                char[] text = new char[maxLength + 1];
+                int finalLength = User32.GetWindowText(WindowHandle, text, maxLength + 1);
+                if (finalLength == 0)
+                {
+                    return string.Empty;
+                }
+
+                return new string(text, 0, finalLength);
+            }
+        }
 
         /// <summary>
         /// 
