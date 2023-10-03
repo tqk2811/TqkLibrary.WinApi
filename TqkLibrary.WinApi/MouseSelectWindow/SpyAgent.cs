@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using TqkLibrary.WinApi.FindWindowHelper;
 using TqkLibrary.WinApi.HookEvents;
 using TqkLibrary.WinApi.PInvokeAdv.Api;
 
@@ -19,7 +20,7 @@ namespace TqkLibrary.WinApi
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler<SpiedWindow> SpiedWindowSelected;
+        public event EventHandler<WindowHelper> OnWindowSelected;
 
         private readonly SynchronizationContext _synchronizationContext;
         private MouseHook _mouseHook;
@@ -133,7 +134,7 @@ namespace TqkLibrary.WinApi
 
                 case User32.WindowMessage.WM_LBUTTONDOWN:
                     try { await EndSpyingAsync(); } catch { }
-                    SpiedWindowSelected?.Invoke(this, GetHoveredWindow());
+                    OnWindowSelected?.Invoke(this, GetHoveredWindow());
                     break;
 
                 case User32.WindowMessage.WM_RBUTTONDOWN:
@@ -146,14 +147,14 @@ namespace TqkLibrary.WinApi
         {
             _synchronizationContext.Post((o) =>
             {
-                SpiedWindow window = GetHoveredWindow();
-                if (window.Handle == IntPtr.Zero)
+                WindowHelper window = GetHoveredWindow();
+                if (window.WindowHandle == IntPtr.Zero || !window.Area.HasValue)
                 {
                     _locator.Hide();
                     return;
                 }
-                _locator.Location = window.Area.Location;
-                _locator.Size = window.Area.Size;
+                _locator.Location = window.Area.Value.Location;
+                _locator.Size = window.Area.Value.Size;
                 _locator.TopLevel = true;
                 _locator.TopMost = true;
                 _locator.Show();
@@ -166,10 +167,10 @@ namespace TqkLibrary.WinApi
         /// 
         /// </summary>
         /// <returns></returns>
-        public static SpiedWindow GetHoveredWindow()
+        public static WindowHelper GetHoveredWindow()
         {
             IntPtr handle = User32.WindowFromPoint(Cursor.Position);
-            return new SpiedWindow(handle);
+            return new WindowHelper(handle);
         }
 
         private static void MakePassThrough(IntPtr handle)
