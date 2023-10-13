@@ -15,40 +15,12 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="processHandle"></param>
-        public ProcessHelper(IntPtr processHandle)
-        {
-            this.ProcessHandle = processHandle;
-            ProcessId = Kernel32.GetProcessId(processHandle);
-            if (ProcessId == 0)
-            {
-                var error = Kernel32.GetLastError();
-                if (error != Win32ErrorCode.ERROR_SUCCESS)
-                    throw new Win32Exception(error);
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="processId"></param>
         public ProcessHelper(int processId)
         {
             this.ProcessId = processId;
-            using var handle = Kernel32.OpenProcess(Kernel32.ACCESS_MASK.StandardRight.SYNCHRONIZE, true, processId);
-            if (handle.IsInvalid)
-            {
-                var error = Kernel32.GetLastError();
-                if (error != Win32ErrorCode.ERROR_SUCCESS)
-                    throw new Win32Exception(error);
-            }
-            ProcessHandle = handle.DangerousGetHandle();
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public IntPtr ProcessHandle { get; }
         /// <summary>
         /// 
         /// </summary>
@@ -148,13 +120,21 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
+        public Kernel32.SafeObjectHandle GetProcessHandle(Kernel32.ACCESS_MASK.StandardRight standardRight = Kernel32.ACCESS_MASK.StandardRight.SYNCHRONIZE)
+        {
+            return Kernel32.OpenProcess(Kernel32.ACCESS_MASK.StandardRight.SYNCHRONIZE, true, this.ProcessId);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
         public override bool Equals(object obj)
         {
             if (obj is ProcessHelper processHelper)
             {
-                return processHelper.ProcessHandle == this.ProcessHandle;
+                return processHelper.ProcessId == this.ProcessId;
             }
             return base.Equals(obj);
         }
@@ -165,7 +145,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return this.ProcessHandle.GetHashCode();
+            return this.ProcessId.GetHashCode();
         }
     }
 }
