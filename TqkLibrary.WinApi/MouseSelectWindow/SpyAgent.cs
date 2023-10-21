@@ -150,14 +150,17 @@ namespace TqkLibrary.WinApi
                 WindowHelper window = GetHoveredWindow();
                 if (window.WindowHandle == IntPtr.Zero || !window.Area.HasValue)
                 {
-                    _locator.Hide();
+                    _locator?.Hide();
                     return;
                 }
-                _locator.Location = window.Area.Value.Location;
-                _locator.Size = window.Area.Value.Size;
-                _locator.TopLevel = true;
-                _locator.TopMost = true;
-                _locator.Show();
+                if(_locator is not null)
+                {
+                    _locator.Location = window.Area.Value.Location;
+                    _locator.Size = window.Area.Value.Size;
+                    _locator.TopLevel = true;
+                    _locator.TopMost = true;
+                    _locator.Show();
+                }
             },
             null);
         }
