@@ -19,7 +19,7 @@ namespace TqkLibrary.WinApi.HandleControls
         /// <summary>
         /// default 34
         /// </summary>
-        public int FixPosClickY { get; } = 34;
+        public int FixPosClickY { get; set; } = 34;
         const int Srccopy = 0x00CC0020;
 
         readonly IntPtr TopWindowHandle;
