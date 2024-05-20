@@ -1,5 +1,4 @@
 ﻿//https://github.com/justcoding121/windows-user-action-hook
-using PInvoke;
 using System;
 
 namespace TqkLibrary.WinApi.HookEvents
@@ -12,30 +11,26 @@ namespace TqkLibrary.WinApi.HookEvents
         /// <summary>
         /// 
         /// </summary>
-        public static IntPtr User32Module { get { return Kernel32.GetModuleHandle("user32"); } }
+        internal static FreeLibrarySafeHandle GetUser32Module()
+        {
+            return PInvoke.GetModuleHandle("user32");
+        }
 
-        private User32.SafeHookHandle _windowsHookExHandle;
+
+
+        private UnhookWindowsHookExSafeHandle? _windowsHookExHandle;
         /// <summary>
         /// 
         /// </summary>
-        protected User32.SafeHookHandle WindowsHookExHandle
+        internal UnhookWindowsHookExSafeHandle? WindowsHookExHandle
         {
             get { return _windowsHookExHandle; }
             set
             {
                 _windowsHookExHandle = value;
-                if (value is not null)
-                {
-                    _hookHandle = value.DangerousGetHandle();
-                }
             }
         }
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected IntPtr _hookHandle = IntPtr.Zero;
 
         /// <summary>
         /// 
@@ -75,9 +70,9 @@ namespace TqkLibrary.WinApi.HookEvents
         /// <param name="wParam"></param>
         /// <param name="lParam"></param>
         /// <returns></returns>
-        protected virtual int HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        internal virtual LRESULT HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
         {
-            return User32.CallNextHookEx(_hookHandle, nCode, wParam, lParam);
+            return PInvoke.CallNextHookEx(WindowsHookExHandle, nCode, wParam, lParam);
         }
     }
 }

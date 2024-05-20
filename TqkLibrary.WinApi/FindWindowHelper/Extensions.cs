@@ -1,5 +1,4 @@
-﻿using PInvoke;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -16,29 +15,32 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// </summary>
         /// <param name="process_id"></param>
         /// <returns></returns>
-        public static IEnumerable<IntPtr> GetWindowsOfProcess(this int process_id)
+        internal static unsafe IEnumerable<HWND> GetWindowsOfProcess(this uint process_id)
         {
-            IReadOnlyList<IntPtr> windows = EnumWindows();
-            IReadOnlyList<IntPtr> childWindows = GetChildWindows(IntPtr.Zero);
-            foreach (IntPtr hWnd in windows.Concat(childWindows).Distinct())
+            List<HWND> result = new List<HWND>();
+            IReadOnlyList<HWND> windows = EnumWindows();
+            IReadOnlyList<HWND> childWindows = GetChildWindows((HWND)IntPtr.Zero);
+            foreach (HWND hWnd in windows.Concat(childWindows).Distinct())
             {
-                User32.GetWindowThreadProcessId(hWnd, out int lpdwProcessId);
-                if (lpdwProcessId == process_id)
-                    yield return hWnd;
+                uint ProcessId = 0;
+                PInvoke.GetWindowThreadProcessId(hWnd, &ProcessId);
+                if (ProcessId == process_id)
+                    result.Add(hWnd);
             }
+            return result;
         }
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public static IReadOnlyList<IntPtr> EnumWindows()
+        internal static IReadOnlyList<HWND> EnumWindows()
         {
-            List<IntPtr> result = new List<IntPtr>();
+            List<HWND> result = new List<HWND>();
             GCHandle listHandle = GCHandle.Alloc(result);
             try
             {
-                User32.WNDENUMPROC wndEnumProc = EnumWindow;
-                User32.EnumWindows(wndEnumProc, GCHandle.ToIntPtr(listHandle));
+                WNDENUMPROC wndEnumProc = EnumWindow;
+                PInvoke.EnumWindows(wndEnumProc, GCHandle.ToIntPtr(listHandle));
             }
             finally
             {
@@ -47,10 +49,10 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             }
             return result;
         }
-        static bool EnumWindow(IntPtr handle, IntPtr pointer)
+        static BOOL EnumWindow(HWND handle, LPARAM pointer)
         {
             GCHandle gch = GCHandle.FromIntPtr(pointer);
-            List<IntPtr> list = gch.Target as List<IntPtr>;
+            List<HWND>? list = gch.Target as List<HWND>;
             if (list == null)
             {
                 throw new InvalidCastException("GCHandle Target could not be cast as List<IntPtr>");
@@ -64,15 +66,14 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// </summary>
         /// <param name="parent"></param>
         /// <returns></returns>
-        public static IReadOnlyList<IntPtr> GetChildWindows(this IntPtr parent)
+        internal static IReadOnlyList<HWND> GetChildWindows(this HWND parent)
         {
-            List<IntPtr> result = new List<IntPtr>();
+            List<HWND> result = new List<HWND>();
             GCHandle listHandle = GCHandle.Alloc(result);
             try
             {
-                User32.WNDENUMPROC wndEnumProc = EnumWindow;
-                IntPtr intPtrchildProc = Marshal.GetFunctionPointerForDelegate(wndEnumProc);
-                User32.EnumChildWindows(parent, intPtrchildProc, GCHandle.ToIntPtr(listHandle));
+                WNDENUMPROC wndEnumProc = EnumWindow;
+                PInvoke.EnumChildWindows(parent, wndEnumProc, GCHandle.ToIntPtr(listHandle));
             }
             finally
             {

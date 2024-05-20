@@ -1,6 +1,4 @@
-﻿using PInvoke;
-using System;
-using System.Diagnostics;
+﻿using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -20,7 +18,7 @@ namespace TqkLibrary.WinApi.HookEvents
             /// <summary>
             /// 
             /// </summary>
-            public User32.WindowMessage Message { get; internal set; }
+            public nuint Message { get; internal set; }
 
             /// <summary>
             /// 
@@ -33,35 +31,20 @@ namespace TqkLibrary.WinApi.HookEvents
             public uint MouseData { get; internal set; }
         }
 
-        [StructLayout(LayoutKind.Sequential)]
-        private struct POINT
-        {
-            public readonly int x;
-            public readonly int y;
-        }
-        [StructLayout(LayoutKind.Sequential)]
-        private struct MSLLHOOKSTRUCT
-        {
-            internal POINT pt;
-            internal readonly uint mouseData;
-            internal readonly uint flags;
-            internal readonly uint time;
-            internal readonly IntPtr dwExtraInfo;
-        }
-
-
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler<RawMouseEventArgs> MouseAction;
+        public event EventHandler<RawMouseEventArgs>? MouseAction;
 
-        private User32.WindowsHookDelegate _hookCallback;
+
+
+        private HOOKPROC _hookCallback;
         /// <summary>
         /// 
         /// </summary>
         public MouseHook()
         {
-            this._hookCallback = this.HookCallback;
+            _hookCallback = HookCallback;
         }
 
         /// <summary>
@@ -71,10 +54,11 @@ namespace TqkLibrary.WinApi.HookEvents
         {
             if (WindowsHookExHandle is null)
             {
-                WindowsHookExHandle = User32.SetWindowsHookEx(
-                    User32.WindowsHookType.WH_MOUSE_LL,
+                using FreeLibrarySafeHandle freeLibrarySafeHandle = BaseHook.GetUser32Module();
+                WindowsHookExHandle = PInvoke.SetWindowsHookEx(
+                    WINDOWS_HOOK_ID.WH_MOUSE_LL,
                     _hookCallback,
-                    BaseHook.User32Module,
+                    freeLibrarySafeHandle,
                     0
                     );
             }
@@ -87,15 +71,15 @@ namespace TqkLibrary.WinApi.HookEvents
         /// <param name="wParam"></param>
         /// <param name="lParam"></param>
         /// <returns></returns>
-        protected override int HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        internal override LRESULT HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
         {
             if (MouseAction is not null && nCode >= 0)
             {
                 MSLLHOOKSTRUCT hookStruct = (MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(MSLLHOOKSTRUCT));
                 ThreadPool.QueueUserWorkItem((o) => MouseAction?.Invoke(this, new RawMouseEventArgs()
                 {
-                    Message = (User32.WindowMessage)wParam,
-                    Point = new Point(hookStruct.pt.x, hookStruct.pt.y),
+                    Message = wParam,
+                    Point = new Point(hookStruct.pt.X, hookStruct.pt.Y),
                     MouseData = hookStruct.mouseData,
                 }));
             }

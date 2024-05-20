@@ -1,7 +1,6 @@
-﻿using PInvoke;
+﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading;
-using System;
 
 namespace TqkLibrary.WinApi.HookEvents
 {
@@ -18,7 +17,7 @@ namespace TqkLibrary.WinApi.HookEvents
             /// <summary>
             /// 
             /// </summary>
-            public User32.WindowMessage Message { get; internal set; }
+            public nuint Message { get; internal set; }
 
             /// <summary>
             /// 
@@ -28,14 +27,9 @@ namespace TqkLibrary.WinApi.HookEvents
             /// <summary>
             /// 
             /// </summary>
-            public User32.VirtualKey VirtualKey { get { return (User32.VirtualKey)VirtualKeyCode; } }
-
-            /// <summary>
-            /// 
-            /// </summary>
             public bool IsKeyDown
             {
-                get { return Message == User32.WindowMessage.WM_KEYDOWN || Message == User32.WindowMessage.WM_SYSKEYDOWN; }
+                get { return Message == PInvoke.WM_KEYDOWN || Message == PInvoke.WM_SYSKEYDOWN; }
             }
         }
 
@@ -43,15 +37,15 @@ namespace TqkLibrary.WinApi.HookEvents
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler<RawKeyboardEventArgs> KeyboardAction;
+        public event EventHandler<RawKeyboardEventArgs>? KeyboardAction;
 
-        private User32.WindowsHookDelegate _hookCallback;
+        private HOOKPROC _hookCallback;
         /// <summary>
         /// 
         /// </summary>
         public KeyboardHook()
         {
-            this._hookCallback = HookCallback;
+            _hookCallback = HookCallback;
         }
 
         /// <summary>
@@ -61,10 +55,11 @@ namespace TqkLibrary.WinApi.HookEvents
         {
             if (WindowsHookExHandle is null)
             {
-                WindowsHookExHandle = User32.SetWindowsHookEx(
-                    User32.WindowsHookType.WH_KEYBOARD_LL,
+                using FreeLibrarySafeHandle freeLibrarySafeHandle = BaseHook.GetUser32Module();
+                WindowsHookExHandle = PInvoke.SetWindowsHookEx(
+                    WINDOWS_HOOK_ID.WH_KEYBOARD_LL,
                     _hookCallback,
-                    BaseHook.User32Module,
+                    freeLibrarySafeHandle,
                     0
                     );
             }
@@ -77,21 +72,21 @@ namespace TqkLibrary.WinApi.HookEvents
         /// <param name="wParam"></param>
         /// <param name="lParam"></param>
         /// <returns></returns>
-        protected override int HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        internal override LRESULT HookCallback(int nCode, WPARAM wParam, LPARAM lParam)
         {
             if (KeyboardAction is not null &&
                 nCode >= 0 &&
                 (
-                  wParam == (IntPtr)User32.WindowMessage.WM_KEYDOWN ||
-                  wParam == (IntPtr)User32.WindowMessage.WM_KEYUP ||
-                  wParam == (IntPtr)User32.WindowMessage.WM_SYSKEYDOWN ||
-                  wParam == (IntPtr)User32.WindowMessage.WM_SYSKEYUP
+                  wParam == PInvoke.WM_KEYDOWN ||
+                  wParam == PInvoke.WM_KEYUP ||
+                  wParam == PInvoke.WM_SYSKEYDOWN ||
+                  wParam == PInvoke.WM_SYSKEYUP
                 )
             )
             {
                 ThreadPool.QueueUserWorkItem((o) => KeyboardAction?.Invoke(this, new RawKeyboardEventArgs()
                 {
-                    Message = (User32.WindowMessage)wParam,
+                    Message = wParam,
                     VirtualKeyCode = Marshal.ReadInt32(lParam),
                 }));
             }

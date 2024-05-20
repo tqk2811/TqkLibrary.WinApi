@@ -1,13 +1,6 @@
-﻿using PInvoke;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using TqkLibrary.WinApi.PInvokeAdv.Api;
 
 namespace TqkLibrary.WinApi.FindWindowHelper
 {
@@ -37,9 +30,9 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             get
             {
-                if (User32.GetWindowRect(WindowHandle, out RECT rect))
+                if (PInvoke.GetWindowRect((HWND)WindowHandle, out RECT rect))
                 {
-                    return rect.GetRectangle();
+                    return (Rectangle)rect;
                 }
                 return null;
             }
@@ -48,23 +41,26 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
-        public string Title
+        public unsafe string Title
         {
             get
             {
-                int maxLength = User32.GetWindowTextLength(WindowHandle);
+                int maxLength = PInvoke.GetWindowTextLength((HWND)WindowHandle);
                 if (maxLength == 0)
                 {
                     return string.Empty;
                 }
 
                 char[] text = new char[maxLength + 1];
-                int finalLength = User32.GetWindowText(WindowHandle, text, maxLength + 1);
-                if (finalLength == 0)
+                int finalLength = 0;
+                fixed (char* textPtr = text)
                 {
-                    return string.Empty;
+                    finalLength = PInvoke.GetWindowText((HWND)WindowHandle, textPtr, maxLength + 1);
+                    if (finalLength == 0)
+                    {
+                        return string.Empty;
+                    }
                 }
-
                 return new string(text, 0, finalLength);
             }
         }
@@ -72,11 +68,11 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
-        public WindowHelper ParentWindow
+        public WindowHelper? ParentWindow
         {
             get
             {
-                IntPtr handle = User32.GetParent(WindowHandle);
+                IntPtr handle = PInvoke.GetParent((HWND)WindowHandle);
                 if (handle == IntPtr.Zero) return null;
                 return new WindowHelper(handle);
             }
@@ -89,9 +85,9 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             get
             {
-                foreach (var item in WindowHandle.GetChildWindows())
+                foreach (HWND item in ((HWND)WindowHandle).GetChildWindows())
                 {
-                    IntPtr handle = User32.GetParent(item);
+                    IntPtr handle = PInvoke.GetParent(item);
                     if (handle == WindowHandle)
                     {
                         yield return new WindowHelper(item);
@@ -107,7 +103,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             get
             {
-                foreach (var item in WindowHandle.GetChildWindows())
+                foreach (HWND item in ((HWND)WindowHandle).GetChildWindows())
                 {
                     yield return new WindowHelper(item);
                 };
@@ -117,14 +113,16 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
-        public ProcessHelper Process
+        public unsafe ProcessHelper? Process
         {
             get
             {
-                int res = User32.GetWindowThreadProcessId(WindowHandle, out int lpdwProcessId);
+                //System.win
+                uint ProcessId = 0;
+                uint res = PInvoke.GetWindowThreadProcessId((HWND)WindowHandle, &ProcessId);
                 if (res != 0)
                 {
-                    return new ProcessHelper(lpdwProcessId);
+                    return new ProcessHelper(ProcessId);
                 }
                 return null;
             }
@@ -139,7 +137,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             if (obj is WindowHelper windowHelper)
             {
-                return windowHelper.WindowHandle == this.WindowHandle;
+                return windowHelper.WindowHandle == WindowHandle;
             }
             return base.Equals(obj);
         }
@@ -150,7 +148,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return this.WindowHandle.GetHashCode();
+            return WindowHandle.GetHashCode();
         }
     }
 }

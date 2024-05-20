@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TqkLibrary.WinApi.Structs
+﻿namespace TqkLibrary.WinApi.Structs
 {
     /// <summary>
     /// 
@@ -13,7 +11,7 @@ namespace TqkLibrary.WinApi.Structs
         /// <param name="val"></param>
         public KeyState(short val)
         {
-            this.Val = val;
+            Val = val;
         }
         /// <summary>
         /// 

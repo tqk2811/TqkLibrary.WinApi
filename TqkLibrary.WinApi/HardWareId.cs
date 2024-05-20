@@ -13,7 +13,7 @@ namespace TqkLibrary.WinApi
         /// 
         /// </summary>
         /// <returns></returns>
-        public static string GetVolumeSerialNumber()
+        public static string? GetVolumeSerialNumber()
         {
             ManagementObject dsk = new ManagementObject("win32_logicaldisk.deviceid=\"c:\"");
             dsk.Get();
@@ -23,7 +23,7 @@ namespace TqkLibrary.WinApi
         /// 
         /// </summary>
         /// <returns></returns>
-        public static string GetProcessorID()
+        public static string? GetProcessorID()
         {
             var mbs = new ManagementObjectSearcher("Select ProcessorId From Win32_processor");
             ManagementObjectCollection mbsList = mbs.Get();
@@ -37,7 +37,7 @@ namespace TqkLibrary.WinApi
         /// 
         /// </summary>
         /// <returns></returns>
-        public static string GetMainboardSerial()
+        public static string? GetMainboardSerial()
         {
             var mbs = new ManagementObjectSearcher("Select SerialNumber From Win32_BaseBoard");
             ManagementObjectCollection mbsList = mbs.Get();
@@ -52,9 +52,9 @@ namespace TqkLibrary.WinApi
         /// </summary>
         /// <param name="salt"></param>
         /// <returns></returns>
-        public static string CalcHashVolumeSerialNumber(string salt)
+        public static string? CalcHashVolumeSerialNumber(string salt)
         {
-            string volumeserial = GetVolumeSerialNumber();
+            string? volumeserial = GetVolumeSerialNumber();
             using (SHA256 sHA256 = SHA256.Create())
             {
                 byte[] bytes = sHA256.ComputeHash(Encoding.ASCII.GetBytes($"{volumeserial}|{salt}"));

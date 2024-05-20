@@ -1,9 +1,6 @@
-﻿using PInvoke;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 
 namespace TqkLibrary.WinApi.FindWindowHelper
 {
@@ -16,15 +13,15 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// 
         /// </summary>
         /// <param name="processId"></param>
-        public ProcessHelper(int processId)
+        public ProcessHelper(uint processId)
         {
-            this.ProcessId = processId;
+            ProcessId = processId;
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public int ProcessId { get; }
+        public uint ProcessId { get; }
 
         /// <summary>
         /// 
@@ -47,10 +44,10 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             get
             {
-                foreach (var handle in ProcessId.GetWindowsOfProcess())
+                foreach (HWND handle in ProcessId.GetWindowsOfProcess())
                 {
-                    IntPtr parentHandle = User32.GetParent(handle);
-                    if(parentHandle == IntPtr.Zero)
+                    HWND parentHandle = PInvoke.GetParent(handle);
+                    if (parentHandle == IntPtr.Zero)
                     {
                         yield return new WindowHelper(handle);
                     }
@@ -61,27 +58,25 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
-        public ProcessHelper ParentProcess
+        public ProcessHelper? ParentProcess
         {
             get
             {
-                using var snapshot = Kernel32.CreateToolhelp32Snapshot(Kernel32.CreateToolhelp32SnapshotFlags.TH32CS_SNAPPROCESS, 0);//TH32CS_SNAPPROCESS will capture all process
-                if (snapshot.IsInvalid)
+                //TH32CS_SNAPPROCESS will capture all process
+                using SafeHandle snapshot = PInvoke.CreateToolhelp32Snapshot_SafeHandle(CREATE_TOOLHELP_SNAPSHOT_FLAGS.TH32CS_SNAPPROCESS, 0);
+                if (!snapshot.IsInvalid)
                 {
-                    var err = Kernel32.GetLastError();
-                    if (err != Win32ErrorCode.ERROR_SUCCESS)
-                        throw new Win32Exception(err);
-                }
-                Kernel32.PROCESSENTRY32 pe = new Kernel32.PROCESSENTRY32();
-                if (Kernel32.Process32First(snapshot, ref pe))
-                {
-                    do
+                    PROCESSENTRY32 pe = new PROCESSENTRY32();
+                    if (PInvoke.Process32First(snapshot, ref pe))
                     {
-                        if (pe.th32ProcessID == ProcessId)
+                        do
                         {
-                            return new ProcessHelper(pe.th32ParentProcessID);
-                        }
-                    } while (Kernel32.Process32Next(snapshot, ref pe));
+                            if (pe.th32ProcessID == ProcessId)
+                            {
+                                return new ProcessHelper(pe.th32ParentProcessID);
+                            }
+                        } while (PInvoke.Process32Next(snapshot, ref pe));
+                    }
                 }
                 return null;
             }
@@ -94,24 +89,23 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             get
             {
-                using var snapshot = Kernel32.CreateToolhelp32Snapshot(Kernel32.CreateToolhelp32SnapshotFlags.TH32CS_SNAPPROCESS, 0);//TH32CS_SNAPPROCESS will capture all process
-                if (snapshot.IsInvalid)
+                //TH32CS_SNAPPROCESS will capture all process
+                using SafeHandle snapshot = PInvoke.CreateToolhelp32Snapshot_SafeHandle(CREATE_TOOLHELP_SNAPSHOT_FLAGS.TH32CS_SNAPPROCESS, 0);
+                if (!snapshot.IsInvalid)
                 {
-                    var err = Kernel32.GetLastError();
-                    if (err != Win32ErrorCode.ERROR_SUCCESS)
-                        throw new Win32Exception(err);
-                }
-                Kernel32.PROCESSENTRY32 pe = new Kernel32.PROCESSENTRY32();
-                if (Kernel32.Process32First(snapshot, ref pe))
-                {
-                    do
+                    PROCESSENTRY32 pe = new PROCESSENTRY32();
+                    if (PInvoke.Process32First(snapshot, ref pe))
                     {
-                        if (pe.th32ParentProcessID == ProcessId)
+                        do
                         {
-                            yield return new ProcessHelper(pe.th32ProcessID);
-                        }
-                    } while (Kernel32.Process32Next(snapshot, ref pe));
+                            if (pe.th32ParentProcessID == ProcessId)
+                            {
+                                yield return new ProcessHelper(pe.th32ProcessID);
+                            }
+                        } while (PInvoke.Process32Next(snapshot, ref pe));
+                    }
                 }
+
             }
         }
 
@@ -120,9 +114,9 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
-        public Kernel32.SafeObjectHandle GetProcessHandle(Kernel32.ACCESS_MASK.StandardRight standardRight = Kernel32.ACCESS_MASK.StandardRight.SYNCHRONIZE)
+        internal SafeHandle GetProcessHandle(PROCESS_ACCESS_RIGHTS standardRight = PROCESS_ACCESS_RIGHTS.PROCESS_SYNCHRONIZE)
         {
-            return Kernel32.OpenProcess(Kernel32.ACCESS_MASK.StandardRight.SYNCHRONIZE, true, this.ProcessId);
+            return PInvoke.OpenProcess_SafeHandle(standardRight, true, ProcessId);
         }
 
         /// <summary>
@@ -134,7 +128,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             if (obj is ProcessHelper processHelper)
             {
-                return processHelper.ProcessId == this.ProcessId;
+                return processHelper.ProcessId == ProcessId;
             }
             return base.Equals(obj);
         }
@@ -145,7 +139,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <returns></returns>
         public override int GetHashCode()
         {
-            return this.ProcessId.GetHashCode();
+            return ProcessId.GetHashCode();
         }
     }
 }

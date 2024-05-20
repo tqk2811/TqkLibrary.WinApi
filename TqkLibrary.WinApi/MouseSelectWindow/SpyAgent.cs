@@ -1,14 +1,9 @@
-﻿using PInvoke;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Drawing;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using TqkLibrary.WinApi.FindWindowHelper;
 using TqkLibrary.WinApi.HookEvents;
-using TqkLibrary.WinApi.PInvokeAdv.Api;
 
 namespace TqkLibrary.WinApi
 {
@@ -20,11 +15,11 @@ namespace TqkLibrary.WinApi
         /// <summary>
         /// 
         /// </summary>
-        public event EventHandler<WindowHelper> OnWindowSelected;
+        public event EventHandler<WindowHelper?>? OnWindowSelected;
 
         private readonly SynchronizationContext _synchronizationContext;
-        private MouseHook _mouseHook;
-        private SpyAgentLocator _locator;
+        private MouseHook? _mouseHook;
+        private SpyAgentLocator? _locator;
 
         /// <summary>
         /// 
@@ -40,7 +35,7 @@ namespace TqkLibrary.WinApi
         /// <param name="synchronizationContext">requied for main thread sta</param>
         public SpyAgent(SynchronizationContext synchronizationContext)
         {
-            this._synchronizationContext = synchronizationContext;
+            _synchronizationContext = synchronizationContext;
         }
 
         /// <summary>
@@ -70,7 +65,7 @@ namespace TqkLibrary.WinApi
                 _locator?.Close();
                 _locator?.Dispose();
                 _locator = new SpyAgentLocator();
-                MakePassThrough(_locator.Handle);
+                MakePassThrough((HWND)_locator.Handle);
 
                 _mouseHook?.Dispose();
                 _mouseHook = new MouseHook();
@@ -128,16 +123,16 @@ namespace TqkLibrary.WinApi
         {
             switch (e.Message)
             {
-                case User32.WindowMessage.WM_MOUSEMOVE:
+                case PInvoke.WM_MOUSEMOVE:
                     ShowLocator();
                     break;
 
-                case User32.WindowMessage.WM_LBUTTONDOWN:
+                case PInvoke.WM_LBUTTONDOWN:
                     try { await EndSpyingAsync(); } catch { }
                     OnWindowSelected?.Invoke(this, GetHoveredWindow());
                     break;
 
-                case User32.WindowMessage.WM_RBUTTONDOWN:
+                case PInvoke.WM_RBUTTONDOWN:
                     EndSpying();
                     break;
             }
@@ -153,7 +148,7 @@ namespace TqkLibrary.WinApi
                     _locator?.Hide();
                     return;
                 }
-                if(_locator is not null)
+                if (_locator is not null)
                 {
                     _locator.Location = window.Area.Value.Location;
                     _locator.Size = window.Area.Value.Size;
@@ -170,16 +165,21 @@ namespace TqkLibrary.WinApi
         /// 
         /// </summary>
         /// <returns></returns>
-        public static WindowHelper GetHoveredWindow()
+        public static WindowHelper? GetHoveredWindow()
         {
-            IntPtr handle = User32.WindowFromPoint(Cursor.Position);
-            return new WindowHelper(handle);
+            if (PInvoke.GetCursorPos(out Point point))
+            {
+                HWND handle = PInvoke.WindowFromPoint(point);
+                return new WindowHelper(handle);
+            }
+            return null;
         }
 
-        private static void MakePassThrough(IntPtr handle)
+        const long WS_EX_TRANSPARENT = 0x00000020L;
+        private static void MakePassThrough(HWND handle)
         {
-            int exstyle = User32.GetWindowLong(handle, User32.WindowLongIndexFlags.GWL_EXSTYLE);
-            User32.SetWindowLong(handle, User32.WindowLongIndexFlags.GWL_EXSTYLE, User32.SetWindowLongFlags.WS_EX_TRANSPARENT | (User32.SetWindowLongFlags)exstyle);
+            int exstyle = PInvoke.GetWindowLong(handle, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
+            PInvoke.SetWindowLong(handle, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE, (int)WS_EX_TRANSPARENT | exstyle);
         }
         #endregion Under the Hood
     }

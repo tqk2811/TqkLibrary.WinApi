@@ -1,5 +1,4 @@
-﻿using PInvoke;
-using System;
+﻿using System;
 using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,7 +27,7 @@ namespace TqkLibrary.WinApi.HandleControls
         public MemuAndroidEmulatorHelper(IntPtr handle)
         {
             if (handle == IntPtr.Zero) throw new ArgumentNullException(nameof(handle));
-            this.Handle = handle;
+            Handle = handle;
         }
 
         /// <summary>
@@ -43,7 +42,7 @@ namespace TqkLibrary.WinApi.HandleControls
         /// </summary>
         /// <param name="captureType"></param>
         /// <returns></returns>
-        public Bitmap Capture(CaptureType captureType = CaptureType.PrintWindow) => this.Handle.Capture(captureType);
+        public Bitmap Capture(CaptureType captureType = CaptureType.PrintWindow) => Handle.Capture(captureType);
 
         /// <summary>
         /// 
@@ -73,11 +72,11 @@ namespace TqkLibrary.WinApi.HandleControls
         const uint MK_LBUTTON = 0x0001;
         internal static void MemuControlLClick(this IntPtr windowHandle, Point point)
         {
-            User32.SendMessage(windowHandle, User32.WindowMessage.WM_SETCURSOR, windowHandle, htclient_wm_mousemove);
-            User32.PostMessage(windowHandle, User32.WindowMessage.WM_MOUSEMOVE, IntPtr.Zero, point.ToLParam());
-            User32.PostMessage(windowHandle, User32.WindowMessage.WM_MOUSELEAVE, IntPtr.Zero, IntPtr.Zero);
-            User32.PostMessage(windowHandle, User32.WindowMessage.WM_LBUTTONDOWN, new IntPtr(MK_LBUTTON), point.ToLParam());
-            User32.PostMessage(windowHandle, User32.WindowMessage.WM_LBUTTONUP, new IntPtr(0), point.ToLParam());
+            PInvoke.SendMessage((HWND)windowHandle, PInvoke.WM_SETCURSOR, new WPARAM((nuint)(nint)windowHandle), htclient_wm_mousemove);
+            PInvoke.PostMessage((HWND)windowHandle, PInvoke.WM_MOUSEMOVE, default, point.ToLParam());
+            PInvoke.PostMessage((HWND)windowHandle, PInvoke.WM_MOUSELEAVE, default, default);
+            PInvoke.PostMessage((HWND)windowHandle, PInvoke.WM_LBUTTONDOWN, new WPARAM(MK_LBUTTON), point.ToLParam());
+            PInvoke.PostMessage((HWND)windowHandle, PInvoke.WM_LBUTTONUP, default, point.ToLParam());
         }
     }
 }
