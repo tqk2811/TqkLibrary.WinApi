@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Management;
 using System.Runtime.InteropServices;
 
 namespace TqkLibrary.WinApi.FindWindowHelper
@@ -105,11 +107,26 @@ namespace TqkLibrary.WinApi.FindWindowHelper
                         } while (PInvoke.Process32Next(snapshot, ref pe));
                     }
                 }
-
             }
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
+        public string? Arguments
+        {
+            get
+            {
+                using ManagementObjectSearcher searcher = new ManagementObjectSearcher($"select CommandLine from Win32_Process where ProcessId='{ProcessId}'");
+                using ManagementObjectCollection moCollection = searcher.Get();
+                using ManagementObject? mo = moCollection.OfType<ManagementObject>().FirstOrDefault();
+                if (mo is not null)
+                {
+                    return mo["CommandLine"]?.ToString();
+                }
+                return null;
+            }
+        }
 
         /// <summary>
         /// 
