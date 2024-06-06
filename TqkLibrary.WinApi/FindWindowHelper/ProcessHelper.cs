@@ -158,5 +158,19 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             return ProcessId.GetHashCode();
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static IReadOnlyList<ProcessHelper> AllProcesses
+        {
+            get
+            {
+                return System.Diagnostics.Process.GetProcesses()
+                    .Select(x => new ProcessHelper((uint)x.Id))
+                    .ToList();
+            }
+        }
     }
 }
