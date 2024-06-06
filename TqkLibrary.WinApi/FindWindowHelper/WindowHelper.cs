@@ -231,5 +231,17 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             if (hwnd.IsNull) return null;
             return new WindowHelper(hwnd);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static WindowHelper? WindowFromPoint(Point point)
+        {
+            HWND hwnd = PInvoke.WindowFromPoint(point);
+            if (hwnd.IsNull) return null;
+            return new WindowHelper(hwnd);
+        }
     }
 }
