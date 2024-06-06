@@ -196,7 +196,29 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             return WindowHandle.GetHashCode();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="wParam"></param>
+        /// <param name="lParam"></param>
+        /// <returns></returns>
+        public nint SendMessage(uint msg, nuint wParam, nint lParam)
+        {
+            return PInvoke.SendMessage((HWND)WindowHandle, msg, (WPARAM)wParam, (LPARAM)lParam);
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="wParam"></param>
+        /// <param name="lParam"></param>
+        /// <returns></returns>
+        public nint PostMessage(uint msg, nuint wParam, nint lParam)
+        {
+            return PInvoke.PostMessage((HWND)WindowHandle, msg, (WPARAM)wParam, (LPARAM)lParam);
+        }
         /// <summary>
         /// 
         /// </summary>
