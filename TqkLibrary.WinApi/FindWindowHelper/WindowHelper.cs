@@ -176,5 +176,16 @@ namespace TqkLibrary.WinApi.FindWindowHelper
                     .ToList();
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static WindowHelper? GetFocus()
+        {
+            HWND hwnd = PInvoke.GetFocus();
+            if (hwnd.IsNull) return null;
+            return new WindowHelper(hwnd);
+        }
     }
 }

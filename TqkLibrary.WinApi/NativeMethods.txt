@@ -37,6 +37,7 @@ SetWindowPos
 GetKeyState
 IsWindowUnicode
 IsWindowVisible
+GetFocus
 
 
 
