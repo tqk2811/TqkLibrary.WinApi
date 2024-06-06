@@ -88,6 +88,16 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsWindow
+        {
+            get
+            {
+                return PInvoke.IsWindow((HWND)WindowHandle);
+            }
+        }
 
         /// <summary>
         /// 
