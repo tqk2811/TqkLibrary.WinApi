@@ -36,6 +36,7 @@ PostMessage
 SetWindowPos
 GetKeyState
 IsWindowUnicode
+IsWindowVisible
 
 
 

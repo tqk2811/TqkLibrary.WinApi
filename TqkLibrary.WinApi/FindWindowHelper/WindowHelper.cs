@@ -69,6 +69,17 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
+        public bool IsWindowVisible
+        {
+            get
+            {
+                return PInvoke.IsWindowVisible((HWND)WindowHandle);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public WindowHelper? ParentWindow
         {
             get
