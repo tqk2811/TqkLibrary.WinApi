@@ -187,5 +187,16 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             if (hwnd.IsNull) return null;
             return new WindowHelper(hwnd);
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static WindowHelper? GetActiveWindow()
+        {
+            HWND hwnd = PInvoke.GetActiveWindow();
+            if (hwnd.IsNull) return null;
+            return new WindowHelper(hwnd);
+        }
     }
 }

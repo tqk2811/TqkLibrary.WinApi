@@ -38,6 +38,7 @@ GetKeyState
 IsWindowUnicode
 IsWindowVisible
 GetFocus
+GetActiveWindow
 
 
 
