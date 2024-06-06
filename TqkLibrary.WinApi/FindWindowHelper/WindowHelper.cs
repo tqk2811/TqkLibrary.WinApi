@@ -100,6 +100,17 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         }
 
         /// <summary>
+        /// Determines whether the specified window is minimized (iconic).
+        /// </summary>
+        public bool IsIconic
+        {
+            get
+            {
+                return PInvoke.IsIconic((HWND)WindowHandle);
+            }
+        }
+
+        /// <summary>
         /// 
         /// </summary>
         public WindowHelper? ParentWindow
