@@ -219,6 +219,14 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             return PInvoke.PostMessage((HWND)WindowHandle, msg, (WPARAM)wParam, (LPARAM)lParam);
         }
+
+
+
+
+
+
+
+
         /// <summary>
         /// 
         /// </summary>
