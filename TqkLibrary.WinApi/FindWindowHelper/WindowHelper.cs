@@ -80,6 +80,18 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
+        public bool IsWindowUnicode
+        {
+            get
+            {
+                return PInvoke.IsWindowUnicode((HWND)WindowHandle);
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
         public WindowHelper? ParentWindow
         {
             get
