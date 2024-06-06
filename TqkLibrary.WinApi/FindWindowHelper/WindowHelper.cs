@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace TqkLibrary.WinApi.FindWindowHelper
 {
@@ -149,6 +150,20 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         public override int GetHashCode()
         {
             return WindowHandle.GetHashCode();
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static IReadOnlyList<WindowHelper> AllWindows
+        {
+            get
+            {
+                return Extensions.EnumWindows()
+                    .Select(x => new WindowHelper(x))
+                    .ToList();
+            }
         }
     }
 }
