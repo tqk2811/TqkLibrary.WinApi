@@ -9,7 +9,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
     /// <summary>
     /// 
     /// </summary>
-    public class ProcessHelper
+    public partial class ProcessHelper
     {
         /// <summary>
         /// 
@@ -107,24 +107,6 @@ namespace TqkLibrary.WinApi.FindWindowHelper
                         } while (PInvoke.Process32Next(snapshot, ref pe));
                     }
                 }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string? Arguments
-        {
-            get
-            {
-                using ManagementObjectSearcher searcher = new ManagementObjectSearcher($"select CommandLine from Win32_Process where ProcessId='{ProcessId}'");
-                using ManagementObjectCollection moCollection = searcher.Get();
-                using ManagementObject? mo = moCollection.OfType<ManagementObject>().FirstOrDefault();
-                if (mo is not null)
-                {
-                    return mo["CommandLine"]?.ToString();
-                }
-                return null;
             }
         }
 
