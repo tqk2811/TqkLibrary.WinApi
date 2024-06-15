@@ -9,78 +9,6 @@ namespace TqkLibrary.WinApi.FindWindowHelper
 {
     public partial class ProcessHelper
     {
-        static readonly Regex regex_windowDateTime = new Regex("(\\d{14}\\.\\d{6})([+-]{1}\\d+)$");
-
-        static readonly IReadOnlyDictionary<Type, Action<Win32_Process, PropertyInfo, string>> dict_Win32_Process
-            = new Dictionary<Type, Action<Win32_Process, PropertyInfo, string>>()
-        {
-            {
-                typeof(string),
-                (win32_Process,propertyInfo,value) =>
-                {
-                    propertyInfo.SetValue(win32_Process, value);
-                }
-            },
-            {
-                typeof(Nullable<UInt16>),
-                (win32_Process,propertyInfo,value) =>
-                {
-                    if(UInt16.TryParse(value,out UInt16 v))
-                    {
-                        propertyInfo.SetValue(win32_Process, v);
-                    }
-                }
-            },
-            {
-                typeof(Nullable<UInt32>),
-                (win32_Process,propertyInfo,value) =>
-                {
-                    if(UInt32.TryParse(value,out UInt32 v))
-                    {
-                        propertyInfo.SetValue(win32_Process, v);
-                    }
-                }
-            },
-            {
-                typeof(Nullable<UInt64>),
-                (win32_Process,propertyInfo,value) =>
-                {
-                    if(UInt64.TryParse(value,out UInt64 v))
-                    {
-                        propertyInfo.SetValue(win32_Process, v);
-                    }
-                }
-            },
-            {
-                typeof(Nullable<DateTime>),
-                (win32_Process,propertyInfo,value) =>
-                {
-                    //20240615101842.546420+420
-                    Match match = regex_windowDateTime.Match(value);
-                    if(match.Success)
-                    {
-                        if(int.TryParse(match.Groups[2].Value,out int minuteOffset))
-                        {
-                            int hour = minuteOffset / 60;
-                            string _hour = minuteOffset >= 0 ? $"+{hour:00}" : hour.ToString("00");
-                            int min = minuteOffset % 60;
-
-                            if(DateTime.TryParseExact(
-                                $"{match.Groups[1].Value}{_hour}:{min:00}",
-                                "yyyyMMddHHmmss.ffffffzzz",
-                                System.Globalization.CultureInfo.InvariantCulture,
-                                System.Globalization.DateTimeStyles.None,
-                                out DateTime v))
-                            {
-                                propertyInfo.SetValue(win32_Process, v.AddMinutes(minuteOffset));
-                            }
-                        }
-                    }
-                }
-            },
-        };
-
-
         /// <summary>
         /// 
         /// </summary>
@@ -94,18 +22,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             if (mo is not null)
             {
                 Win32_Process win32_Process = new Win32_Process();
-                PropertyInfo[] properties = typeof(Win32_Process).GetProperties();
-                foreach (PropertyInfo propertyInfo in properties)
-                {
-                    string? value = mo[propertyInfo.Name]?.ToString();
-                    if (!string.IsNullOrWhiteSpace(value))
-                    {
-                        if (dict_Win32_Process.ContainsKey(propertyInfo.PropertyType))
-                        {
-                            dict_Win32_Process[propertyInfo.PropertyType].Invoke(win32_Process, propertyInfo, value!);
-                        }
-                    }
-                }
+                win32_Process.Parse(mo);
                 return win32_Process;
             }
             return null;
@@ -114,7 +31,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-process
         /// </summary>
-        public class Win32_Process
+        public class Win32_Process : BaseWmiData
         {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
             public string? CreationClassName { get; set; }
