@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
@@ -69,6 +70,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
                 if (!snapshot.IsInvalid)
                 {
                     PROCESSENTRY32 pe = new PROCESSENTRY32();
+                    pe.dwSize = (uint)Marshal.SizeOf(typeof(PROCESSENTRY32));
                     if (PInvoke.Process32First(snapshot, ref pe))
                     {
                         do
@@ -96,6 +98,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
                 if (!snapshot.IsInvalid)
                 {
                     PROCESSENTRY32 pe = new PROCESSENTRY32();
+                    pe.dwSize = (uint)Marshal.SizeOf(typeof(PROCESSENTRY32));
                     if (PInvoke.Process32First(snapshot, ref pe))
                     {
                         do
