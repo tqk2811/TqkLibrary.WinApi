@@ -12,10 +12,36 @@ namespace TqkLibrary.WinApi.ConsoleTest
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            ProcessHelper processHelper = Process.GetProcessesByName("chrome").Select(x => new ProcessHelper((uint)x.Id)).First();
-            ProcessHelper.Win32_Process? win32_Process = processHelper.Query_Win32_Process();
+            ProcessHelper rootProcessHelper = new ProcessHelper((uint)16760);
+
+            List<ProcessHelper> processHelpers = new List<ProcessHelper>();
+            processHelpers.Add(rootProcessHelper);
+            processHelpers.AddRange(rootProcessHelper.ChildrensProcess);
+
+            foreach (ProcessHelper processHelper in processHelpers)
+            {
+                foreach (WindowHelper windowHelper in processHelper.AllWindows)
+                {
+                    if (windowHelper.Title?.Contains("Open", StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        WindowHelper? ComboBoxEx32 = windowHelper.ChildrensWindow.FirstOrDefault(x => x.ClassName.Equals("ComboBoxEx32"));
+                        WindowHelper? ComboBox = ComboBoxEx32?.ChildrensWindow?.FirstOrDefault(x => x.ClassName.Equals("ComboBox"));
+                        WindowHelper? Edit = ComboBox?.ChildrensWindow?.FirstOrDefault(x => x.ClassName.Equals("Edit"));
+                        WindowHelper? openButton = windowHelper.ChildrensWindow.FirstOrDefault(x => x.ClassName.Equals("Button") && x.Title.Equals("&Open"));
+                        if (Edit is not null && openButton is not null)
+                        {
+                            await Edit.WindowHandle.SendTextUnicodeAsync("C:\\Users\\tqk2811\\Pictures\\Otaku\\anemoi\\character_2.png");
+                            uint BM_CLICK = 245U;
+                            openButton.SendMessage(BM_CLICK, 0, 0);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            ProcessHelper.Win32_Process? win32_Process = rootProcessHelper.Query_Win32_Process();
 
 
 
