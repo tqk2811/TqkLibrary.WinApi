@@ -47,23 +47,40 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             get
             {
+                //window title 
                 int maxLength = PInvoke.GetWindowTextLength((HWND)WindowHandle);
-                if (maxLength == 0)
+                if (maxLength > 0)
                 {
-                    return string.Empty;
-                }
-
-                char[] text = new char[maxLength + 1];
-                int finalLength = 0;
-                fixed (char* textPtr = text)
-                {
-                    finalLength = PInvoke.GetWindowText((HWND)WindowHandle, textPtr, maxLength + 1);
-                    if (finalLength == 0)
+                    char[] text = new char[maxLength + 1];
+                    int finalLength = 0;
+                    fixed (char* textPtr = text)
                     {
-                        return string.Empty;
+                        finalLength = PInvoke.GetWindowText((HWND)WindowHandle, textPtr, maxLength + 1);
+                        if (finalLength > 0)
+                        {
+                            return new string(text, 0, finalLength);
+                        }
                     }
                 }
-                return new string(text, 0, finalLength);
+
+                //from control of another process
+                //https://stackoverflow.com/a/7740920/5034139
+                nint titleSize = SendMessage(PInvoke.WM_GETTEXTLENGTH, 0, 0);
+                if (titleSize > 0)
+                {
+                    char[] text = new char[titleSize + 1];
+                    nint finalLength = 0;
+                    fixed (char* textPtr = text)
+                    {
+                        finalLength = SendMessage(PInvoke.WM_GETTEXT, (nuint)text.Length, (IntPtr)textPtr);
+                        if(finalLength > 0)
+                        {
+                            return new string(text, 0, (int)finalLength);
+                        }
+                    }
+                }
+
+                return string.Empty;
             }
         }
 
