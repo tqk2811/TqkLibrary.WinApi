@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
-using Windows.Storage.Streams;
 
 namespace TqkLibrary.WinApi.FindWindowHelper
 {
