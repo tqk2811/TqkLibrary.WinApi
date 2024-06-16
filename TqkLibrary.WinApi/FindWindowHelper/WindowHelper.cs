@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Text;
+using Windows.Storage.Streams;
 
 namespace TqkLibrary.WinApi.FindWindowHelper
 {
@@ -57,6 +60,27 @@ namespace TqkLibrary.WinApi.FindWindowHelper
                 fixed (char* textPtr = text)
                 {
                     finalLength = PInvoke.GetWindowText((HWND)WindowHandle, textPtr, maxLength + 1);
+                    if (finalLength == 0)
+                    {
+                        return string.Empty;
+                    }
+                }
+                return new string(text, 0, finalLength);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public unsafe string ClassName
+        {
+            get
+            {
+                char[] text = new char[129];
+                int finalLength = 0;
+                fixed (char* textPtr = text)
+                {
+                    finalLength = PInvoke.GetClassName((HWND)WindowHandle, textPtr, text.Length);
                     if (finalLength == 0)
                     {
                         return string.Empty;

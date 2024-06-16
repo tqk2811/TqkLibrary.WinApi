@@ -41,6 +41,7 @@ GetFocus
 GetActiveWindow
 IsWindow
 IsIconic
+GetClassName
 
 
 
