@@ -144,6 +144,15 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             return ProcessId.GetHashCode();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return $"{nameof(ProcessId)}: {ProcessId}";
+        }
+
 
         /// <summary>
         /// 

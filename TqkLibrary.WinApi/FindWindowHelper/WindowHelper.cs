@@ -221,6 +221,15 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return $"{nameof(WindowHandle)}:{WindowHandle}, {nameof(Title)}: '{Title}', {nameof(ClassName)}: '{ClassName}'";
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="msg"></param>
         /// <param name="wParam"></param>
         /// <param name="lParam"></param>
