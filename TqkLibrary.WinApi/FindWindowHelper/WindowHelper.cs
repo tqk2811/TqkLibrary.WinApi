@@ -251,8 +251,15 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             return PInvoke.PostMessage((HWND)WindowHandle, msg, (WPARAM)wParam, (LPARAM)lParam);
         }
 
-
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public bool SetWindowText(string text)
+        {
+            return PInvoke.SetWindowText((HWND)WindowHandle, text);
+        }
 
 
 
