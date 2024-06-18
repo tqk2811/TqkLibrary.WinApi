@@ -20,6 +20,15 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             ProcessId = processId;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="processId"></param>
+        public ProcessHelper(int processId)
+        {
+            ProcessId = (uint)processId;
+        }
+
 
         /// <summary>
         /// 
