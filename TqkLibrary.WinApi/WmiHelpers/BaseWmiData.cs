@@ -62,45 +62,51 @@ namespace TqkLibrary.WinApi.WmiHelpers
             PropertyInfo[] properties = this.GetType().GetProperties();
             foreach (PropertyInfo propertyInfo in properties)
             {
-                object? value = managementObject[propertyInfo.Name];
-                if (value is not null)
+                foreach(PropertyData propertyData in managementObject.Properties)
                 {
-                    Type value_type = value.GetType();
-                    if (value_type.Equals(propertyInfo.PropertyType))
+                    if(propertyData.Name.Equals(propertyInfo.Name))
                     {
-                        propertyInfo.SetValue(this, value);
-                        continue;
-                    }
-                    else
-                    {
-                        if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GenericTypeArguments.Length == 1)
+                        object? value = propertyData.Value;
+                        if (value is not null)
                         {
-                            //Nullable<T>, IEnumerable<T>
-                            Type? NullableUnderlyingType = Nullable.GetUnderlyingType(propertyInfo.PropertyType);
-                            if (NullableUnderlyingType is not null)//Nullable<T>
-                            {
-                                if (value_type.Equals(NullableUnderlyingType))
-                                {
-                                    propertyInfo.SetValue(this, value);
-                                    continue;
-                                }
-                            }
-                            else if (typeof(IEnumerable).IsAssignableFrom(propertyInfo.PropertyType) && propertyInfo.PropertyType.IsInterface)//Array
+                            Type value_type = value.GetType();
+                            if (value_type.Equals(propertyInfo.PropertyType))
                             {
                                 propertyInfo.SetValue(this, value);
                                 continue;
                             }
-                        }
-                    }
-                    if (dict_Win32_Process.ContainsKey(propertyInfo.PropertyType))
-                    {
-                        if (dict_Win32_Process[propertyInfo.PropertyType].Invoke(this, propertyInfo, value))
-                        {
-                            continue;
-                        }
-                    }
+                            else
+                            {
+                                if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GenericTypeArguments.Length == 1)
+                                {
+                                    //Nullable<T>, IEnumerable<T>
+                                    Type? NullableUnderlyingType = Nullable.GetUnderlyingType(propertyInfo.PropertyType);
+                                    if (NullableUnderlyingType is not null)//Nullable<T>
+                                    {
+                                        if (value_type.Equals(NullableUnderlyingType))
+                                        {
+                                            propertyInfo.SetValue(this, value);
+                                            continue;
+                                        }
+                                    }
+                                    else if (typeof(IEnumerable).IsAssignableFrom(propertyInfo.PropertyType) && propertyInfo.PropertyType.IsInterface)//Array
+                                    {
+                                        propertyInfo.SetValue(this, value);
+                                        continue;
+                                    }
+                                }
+                            }
+                            if (dict_Win32_Process.ContainsKey(propertyInfo.PropertyType))
+                            {
+                                if (dict_Win32_Process[propertyInfo.PropertyType].Invoke(this, propertyInfo, value))
+                                {
+                                    continue;
+                                }
+                            }
 
-                    Debug.WriteLine($"Can't set value ({value_type.FullName}) into property ({propertyInfo.PropertyType.FullName})");
+                            Debug.WriteLine($"Can't set value ({value_type.FullName}) into property ({propertyInfo.PropertyType.FullName})");
+                        }
+                    }
                 }
             }
         }
