@@ -43,7 +43,7 @@ namespace TqkLibrary.WinApi.HandleControls
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public Bitmap Capture(CaptureType type) => TopWindowHandle.Capture(type);
+        public Bitmap? Capture(CaptureType type) => TopWindowHandle.Capture(type);
 
         /// <summary>
         /// 
