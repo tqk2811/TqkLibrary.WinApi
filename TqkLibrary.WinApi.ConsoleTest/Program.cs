@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TqkLibrary.WinApi.Enums;
 using TqkLibrary.WinApi.FindWindowHelper;
 using TqkLibrary.WinApi.HandleControls;
+using TqkLibrary.WinApi.WmiHelpers;
 
 namespace TqkLibrary.WinApi.ConsoleTest
 {
@@ -14,8 +15,27 @@ namespace TqkLibrary.WinApi.ConsoleTest
     {
         static async Task Main(string[] args)
         {
-            //ProcessHelper rootProcessHelper = new ProcessHelper((uint)16760);
+            foreach (Win32_PnPEntity win32_PnPEntity in BaseWmiDataQueryHelper
+                .CreateQuery<Win32_PnPEntity>()
+                .Include(x => x.Caption, x => x.Name)
+                .Where(x => x.CreationClassName == "20")
+                .Query())
+            {
 
+            }
+
+            foreach (Win32_PnPEntity win32_PnPEntity in Win32_PnPEntity.Query())
+            {
+
+            }
+
+            foreach (ProcessHelper processHelper in Process.GetProcesses().Select(x => new ProcessHelper(x.Id)))
+            {
+                Win32_Process? win32_Process = processHelper.Query_Win32_Process();
+            }
+
+
+            //ProcessHelper rootProcessHelper = new ProcessHelper((uint)16760);
             //List<ProcessHelper> processHelpers = new List<ProcessHelper>();
             //processHelpers.Add(rootProcessHelper);
             //processHelpers.AddRange(rootProcessHelper.ChildrensProcess);
