@@ -92,7 +92,7 @@ namespace TqkLibrary.WinApi.WmiHelpers
                             }
                         }
                     }
-                    if(dict_Win32_Process.ContainsKey(propertyInfo.PropertyType))
+                    if (dict_Win32_Process.ContainsKey(propertyInfo.PropertyType))
                     {
                         if (dict_Win32_Process[propertyInfo.PropertyType].Invoke(this, propertyInfo, value))
                         {
