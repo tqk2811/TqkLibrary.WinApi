@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.Reflection;
@@ -12,56 +14,20 @@ namespace TqkLibrary.WinApi.WmiHelpers
     /// <summary>
     /// 
     /// </summary>
-    public class BaseWmiData
+    public abstract class BaseWmiData
     {
         static readonly Regex regex_windowDateTime = new Regex("(\\d{14}\\.\\d{6})([+-]{1}\\d+)$");
 
-        static readonly IReadOnlyDictionary<Type, Action<object, PropertyInfo, string>> dict_Win32_Process
-            = new Dictionary<Type, Action<object, PropertyInfo, string>>()
+        static readonly IReadOnlyDictionary<Type, Func<object, PropertyInfo, object, bool>> dict_Win32_Process
+            = new Dictionary<Type, Func<object, PropertyInfo, object, bool>>()
         {
-            {
-                typeof(string),
-                (instance, propertyInfo, value) =>
-                {
-                    propertyInfo.SetValue(instance, value);
-                }
-            },
-            {
-                typeof(Nullable<UInt16>),
-                (instance, propertyInfo, value) =>
-                {
-                    if(UInt16.TryParse(value,out UInt16 v))
-                    {
-                        propertyInfo.SetValue(instance, v);
-                    }
-                }
-            },
-            {
-                typeof(Nullable<UInt32>),
-                (instance, propertyInfo, value) =>
-                {
-                    if(UInt32.TryParse(value,out UInt32 v))
-                    {
-                        propertyInfo.SetValue(instance, v);
-                    }
-                }
-            },
-            {
-                typeof(Nullable<UInt64>),
-                (instance, propertyInfo, value) =>
-                {
-                    if(UInt64.TryParse(value,out UInt64 v))
-                    {
-                        propertyInfo.SetValue(instance, v);
-                    }
-                }
-            },
             {
                 typeof(Nullable<DateTime>),
                 (instance, propertyInfo, value) =>
                 {
+                    string value_str = value as string ?? value.ToString()!;
                     //20240615101842.546420+420
-                    Match match = regex_windowDateTime.Match(value);
+                    Match match = regex_windowDateTime.Match(value_str);
                     if(match.Success)
                     {
                         if(int.TryParse(match.Groups[2].Value,out int minuteOffset))
@@ -77,10 +43,12 @@ namespace TqkLibrary.WinApi.WmiHelpers
                                 System.Globalization.DateTimeStyles.None,
                                 out DateTime v))
                             {
-                                propertyInfo.SetValue(instance, v.AddMinutes(minuteOffset));
+                                propertyInfo.SetValue(instance, v);
+                                return true;
                             }
                         }
                     }
+                    return false;
                 }
             },
         };
@@ -94,13 +62,45 @@ namespace TqkLibrary.WinApi.WmiHelpers
             PropertyInfo[] properties = this.GetType().GetProperties();
             foreach (PropertyInfo propertyInfo in properties)
             {
-                string? value = managementObject[propertyInfo.Name]?.ToString();
-                if (!string.IsNullOrWhiteSpace(value))
+                object? value = managementObject[propertyInfo.Name];
+                if (value is not null)
                 {
-                    if (dict_Win32_Process.ContainsKey(propertyInfo.PropertyType))
+                    Type value_type = value.GetType();
+                    if (value_type.Equals(propertyInfo.PropertyType))
                     {
-                        dict_Win32_Process[propertyInfo.PropertyType].Invoke(this, propertyInfo, value!);
+                        propertyInfo.SetValue(this, value);
+                        continue;
                     }
+                    else
+                    {
+                        if (propertyInfo.PropertyType.IsGenericType && propertyInfo.PropertyType.GenericTypeArguments.Length == 1)
+                        {
+                            //Nullable<T>, IEnumerable<T>
+                            Type? NullableUnderlyingType = Nullable.GetUnderlyingType(propertyInfo.PropertyType);
+                            if (NullableUnderlyingType is not null)//Nullable<T>
+                            {
+                                if (value_type.Equals(NullableUnderlyingType))
+                                {
+                                    propertyInfo.SetValue(this, value);
+                                    continue;
+                                }
+                            }
+                            else if (typeof(IEnumerable).IsAssignableFrom(propertyInfo.PropertyType) && propertyInfo.PropertyType.IsInterface)//Array
+                            {
+                                propertyInfo.SetValue(this, value);
+                                continue;
+                            }
+                        }
+                    }
+                    if(dict_Win32_Process.ContainsKey(propertyInfo.PropertyType))
+                    {
+                        if (dict_Win32_Process[propertyInfo.PropertyType].Invoke(this, propertyInfo, value))
+                        {
+                            continue;
+                        }
+                    }
+
+                    Debug.WriteLine($"Can't set value ({value_type.FullName}) into property ({propertyInfo.PropertyType.FullName})");
                 }
             }
         }
