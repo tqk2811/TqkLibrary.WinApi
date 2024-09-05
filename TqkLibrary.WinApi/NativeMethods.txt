@@ -44,6 +44,11 @@ IsIconic
 GetClassName
 SetWindowText
 
+EnumDisplayMonitors
+GetMonitorInfo
+GetScaleFactorForMonitor
+GetDpiForMonitor
+
 
 
 
@@ -76,3 +81,4 @@ VK_OEM_COMMA
 VK_OEM_PERIOD
 VK_DIVIDE
 VK_CAPITAL
+

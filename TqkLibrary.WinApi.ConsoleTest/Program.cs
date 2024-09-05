@@ -17,9 +17,9 @@ namespace TqkLibrary.WinApi.ConsoleTest
         {
             foreach (Win32_PnPEntity win32_PnPEntity in BaseWmiDataQueryHelper
                 .CreateQuery<Win32_PnPEntity>()
-                .Include(x => x.Caption, x => x.Name)
-                .Where(x => x.CreationClassName == "20")
-                .Query())
+                //.Include(x => x.Caption, x => x.Name, x => x.PNPClass)
+                .Where(x => x.PNPClass == "Image" || x.PNPClass == "Camera")
+                .Query().Where(x => x.PNPClass == "Image" || x.PNPClass == "Camera"))
             {
 
             }
