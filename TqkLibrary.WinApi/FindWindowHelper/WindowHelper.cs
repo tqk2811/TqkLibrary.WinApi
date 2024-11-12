@@ -73,7 +73,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
                     fixed (char* textPtr = text)
                     {
                         finalLength = SendMessage(PInvoke.WM_GETTEXT, (nuint)text.Length, (IntPtr)textPtr);
-                        if(finalLength > 0)
+                        if (finalLength > 0)
                         {
                             return new string(text, 0, (int)finalLength);
                         }
@@ -162,7 +162,6 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             }
         }
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -225,6 +224,43 @@ namespace TqkLibrary.WinApi.FindWindowHelper
                 return null;
             }
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public enum GetAncestorFlags : uint
+        {
+            /// <summary>
+            /// Retrieves the parent window. This does not include the owner, as it does with the <see cref="ParentWindow"/> function.
+            /// </summary>
+            GA_PARENT = 1U,
+            /// <summary>
+            /// Retrieves the root window by walking the chain of parent windows.
+            /// </summary>
+            GA_ROOT = 2U,
+            /// <summary>
+            /// Retrieves the owned root window by walking the chain of parent and owner windows returned by <see cref="ParentWindow"/>.
+            /// </summary>
+            GA_ROOTOWNER = 3U,
+        }
+        /// <summary>
+        /// Retrieves the handle to the ancestor of the specified window.
+        /// </summary>
+        /// <param name="getAncestorFlags">The ancestor to be retrieved. This parameter can be one of the following values.</param>
+        /// <returns>The return value is the handle to the ancestor window.</returns>
+        public WindowHelper? GetAncestor(GetAncestorFlags getAncestorFlags)
+        {
+            IntPtr handle = PInvoke.GetAncestor((HWND)WindowHandle, (GET_ANCESTOR_FLAGS)getAncestorFlags);
+            if (handle == IntPtr.Zero) return null;
+            return new WindowHelper(handle);
+            int a = 0;
+            if (a == 2)
+            {
+
+            }
+        }
+
 
         /// <summary>
         /// 
@@ -293,7 +329,35 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         }
 
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator ==(WindowHelper? a, WindowHelper? b)
+        {
+            if (a is null && b is null)
+                return true;
+            if (ReferenceEquals(a, b))
+                return true;
 
+            if (a is not null && b is not null)
+            {
+                return a.WindowHandle == b.WindowHandle;
+            }
+            return false;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public static bool operator !=(WindowHelper? a, WindowHelper b)
+        {
+            return !(a == b);
+        }
 
 
         /// <summary>
@@ -341,6 +405,67 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             HWND hwnd = PInvoke.WindowFromPoint(point);
             if (hwnd.IsNull) return null;
             return new WindowHelper(hwnd);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static WindowHelper GetShellWindow
+        {
+            get
+            {
+                return new WindowHelper(PInvoke.GetShellWindow());
+            }
+        }
+
+
+
+        const int WS_DISABLED = 0x08000000;
+        const int WS_EX_TOOLWINDOW = 0x00000080;
+        const int WS_EX_APPWINDOW = 0x00040000;
+        /// <summary>
+        /// 
+        /// </summary>
+        public static unsafe IEnumerable<WindowHelper> AllAltTabWindows
+        {
+            get
+            {
+                WindowHelper shellWindow = GetShellWindow;
+
+                return AllWindows
+                    .Where(x =>
+                    {
+                        if (x == shellWindow)
+                            return false;
+                        if (!x.IsWindowVisible)
+                            return false;
+                        if (x.GetAncestor(GetAncestorFlags.GA_ROOT) != x)
+                            return false;
+
+                        int style = PInvoke.GetWindowLong((HWND)x.WindowHandle, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
+                        if (!((style & WS_DISABLED) != WS_DISABLED))
+                            return false;
+                        if ((style & WS_EX_TOOLWINDOW) != 0)
+                            return false;
+                        if ((style & WS_EX_APPWINDOW) != WS_EX_APPWINDOW)
+                            return false;
+
+                        UInt32 cloaked = 0;
+                        HRESULT hr = PInvoke.DwmGetWindowAttribute(
+                            (HWND)x.WindowHandle,
+                            Windows.Win32.Graphics.Dwm.DWMWINDOWATTRIBUTE.DWMWA_CLOAKED,
+                            &cloaked,
+                            sizeof(UInt32)
+                            );
+                        if (hr.Succeeded && cloaked == PInvoke.DWM_CLOAKED_SHELL)
+                            return false;
+
+                        if (string.IsNullOrWhiteSpace(x.Title))
+                            return false;
+
+                        return true;
+                    });
+            }
         }
     }
 }

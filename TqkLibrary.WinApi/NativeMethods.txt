@@ -44,6 +44,8 @@ IsIconic
 GetClassName
 SetWindowText
 GetTopWindow
+GetAncestor
+GetShellWindow
 
 EnumDisplayMonitors
 GetMonitorInfo
@@ -51,7 +53,8 @@ GetScaleFactorForMonitor
 GetDpiForMonitor
 
 
-
+DwmGetWindowAttribute
+DWM_CLOAKED_SHELL
 
 
 MSLLHOOKSTRUCT
@@ -75,6 +78,9 @@ WM_GETTEXTLENGTH
 WM_GETTEXT
 
 WS_EX_TRANSPARENT
+WS_DISABLED
+WS_EX_TOOLWINDOW
+WS_EX_APPWINDOW
 
 VK_OEM_MINUS
 VK_OEM_PLUS

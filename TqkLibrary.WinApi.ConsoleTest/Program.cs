@@ -15,6 +15,10 @@ namespace TqkLibrary.WinApi.ConsoleTest
     {
         static async Task Main(string[] args)
         {
+            var list = WindowHelper.AllAltTabWindows.ToList();
+
+
+
             foreach (Win32_PnPEntity win32_PnPEntity in BaseWmiDataQueryHelper
                 .CreateQuery<Win32_PnPEntity>()
                 //.Include(x => x.Caption, x => x.Name, x => x.PNPClass)
