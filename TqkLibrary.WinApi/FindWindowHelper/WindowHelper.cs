@@ -150,6 +150,20 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         }
 
         /// <summary>
+        /// Examines the Z order of the child windows associated with the specified parent window and retrieves a handle to the child window at the top of the Z order.
+        /// </summary>
+        public WindowHelper? GetTopWindow
+        {
+            get
+            {
+                IntPtr handle = PInvoke.GetTopWindow((HWND)WindowHandle);
+                if (handle == IntPtr.Zero) return null;
+                return new WindowHelper(handle);
+            }
+        }
+
+
+        /// <summary>
         /// 
         /// </summary>
         public WindowHelper? ParentWindow

@@ -43,6 +43,7 @@ IsWindow
 IsIconic
 GetClassName
 SetWindowText
+GetTopWindow
 
 EnumDisplayMonitors
 GetMonitorInfo
