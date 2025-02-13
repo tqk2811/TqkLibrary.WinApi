@@ -178,7 +178,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<WindowHelper> ChildrensWindow
+        public IEnumerable<WindowHelper> ChildrenWindows
         {
             get
             {
@@ -196,7 +196,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
-        public IEnumerable<WindowHelper> AllChildrensWindow
+        public IEnumerable<WindowHelper> AllChildrenWindows
         {
             get
             {
@@ -254,11 +254,6 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             IntPtr handle = PInvoke.GetAncestor((HWND)WindowHandle, (GET_ANCESTOR_FLAGS)getAncestorFlags);
             if (handle == IntPtr.Zero) return null;
             return new WindowHelper(handle);
-            int a = 0;
-            if (a == 2)
-            {
-
-            }
         }
 
 
@@ -377,7 +372,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// 
         /// </summary>
         /// <returns></returns>
-        public static WindowHelper? GetFocus()
+        public static WindowHelper? GetFocusWindow()
         {
             HWND hwnd = PInvoke.GetFocus();
             if (hwnd.IsNull) return null;
@@ -400,7 +395,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// </summary>
         /// <param name="point"></param>
         /// <returns></returns>
-        public static WindowHelper? WindowFromPoint(Point point)
+        public static WindowHelper? GetWindowFromPoint(Point point)
         {
             HWND hwnd = PInvoke.WindowFromPoint(point);
             if (hwnd.IsNull) return null;
@@ -410,13 +405,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
-        public static WindowHelper GetShellWindow
-        {
-            get
-            {
-                return new WindowHelper(PInvoke.GetShellWindow());
-            }
-        }
+        public static WindowHelper GetShellWindow() => new WindowHelper(PInvoke.GetShellWindow());
 
 
 
@@ -430,7 +419,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             get
             {
-                WindowHelper shellWindow = GetShellWindow;
+                WindowHelper shellWindow = GetShellWindow();
 
                 return AllWindows
                     .Where(x =>
