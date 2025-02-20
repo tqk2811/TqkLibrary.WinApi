@@ -75,8 +75,9 @@ namespace TqkLibrary.WinApi.Helpers
         /// <param name="rows"></param>
         /// <param name="cols"></param>
         /// <param name="appScale"></param>
+        /// <param name="isChrome"></param>
         /// <returns></returns>
-        public static (Size, Point) GetLocationApp(int position, int rows = 2, int cols = 2, float? appScale = null)
+        public static (Size, Point) GetLocationApp(int position, int rows = 2, int cols = 2, float? appScale = null, bool isChrome = false)
         {
             var monitors = MonitorHelper.Monitors.ToList();
             var monitorsInfo = monitors.GetMonitorsInfo().ToList();
@@ -100,8 +101,8 @@ namespace TqkLibrary.WinApi.Helpers
                 );
 
             Point resultPoint = new Point(
-                (int)(screenInfo.rcMonitor.left / _appScale) + windowSize.Width * x_location_InScreen,
-                (int)(screenInfo.rcMonitor.top / _appScale) + windowSize.Height * y_location_InScreen
+                (int)(screenInfo.rcMonitor.left / _appScale / (isChrome ? _appScale : 1.0f)) + windowSize.Width * x_location_InScreen,
+                (int)(screenInfo.rcMonitor.top / _appScale / (isChrome ? _appScale : 1.0f)) + windowSize.Height * y_location_InScreen
                 );
 
 
