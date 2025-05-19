@@ -353,8 +353,42 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             return PInvoke.ShowWindow((HWND)WindowHandle, (Windows.Win32.UI.WindowsAndMessaging.SHOW_WINDOW_CMD)nCmdShow);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsAltTabWindow => _CheckIsAltTabWindow(GetShellWindow());
+        unsafe bool _CheckIsAltTabWindow(WindowHelper shellWindow)
+        {
+            if (this == shellWindow)
+                return false;
+            if (!this.IsWindowVisible)
+                return false;
+            if (this.GetAncestor(GetAncestorFlags.GA_ROOT) != this)
+                return false;
 
+            int style = PInvoke.GetWindowLong((HWND)x.WindowHandle, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
+            if (!((style & WS_DISABLED) != WS_DISABLED))
+                return false;
+            if ((style & WS_EX_TOOLWINDOW) != 0)
+                return false;
+            if ((style & WS_EX_APPWINDOW) != WS_EX_APPWINDOW)
+                return false;
 
+            UInt32 cloaked = 0;
+            HRESULT hr = PInvoke.DwmGetWindowAttribute(
+                (HWND)this.WindowHandle,
+                Windows.Win32.Graphics.Dwm.DWMWINDOWATTRIBUTE.DWMWA_CLOAKED,
+                &cloaked,
+                sizeof(UInt32)
+                );
+            if (hr.Succeeded && cloaked == PInvoke.DWM_CLOAKED_SHELL)
+                return false;
+
+            if (string.IsNullOrWhiteSpace(this.Title))
+                return false;
+
+            return true;
+        }
 
 
         /// <summary>
@@ -453,40 +487,8 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             get
             {
                 WindowHelper shellWindow = GetShellWindow();
-
                 return AllWindows
-                    .Where(x =>
-                    {
-                        if (x == shellWindow)
-                            return false;
-                        if (!x.IsWindowVisible)
-                            return false;
-                        if (x.GetAncestor(GetAncestorFlags.GA_ROOT) != x)
-                            return false;
-
-                        int style = PInvoke.GetWindowLong((HWND)x.WindowHandle, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
-                        if (!((style & WS_DISABLED) != WS_DISABLED))
-                            return false;
-                        if ((style & WS_EX_TOOLWINDOW) != 0)
-                            return false;
-                        if ((style & WS_EX_APPWINDOW) != WS_EX_APPWINDOW)
-                            return false;
-
-                        UInt32 cloaked = 0;
-                        HRESULT hr = PInvoke.DwmGetWindowAttribute(
-                            (HWND)x.WindowHandle,
-                            Windows.Win32.Graphics.Dwm.DWMWINDOWATTRIBUTE.DWMWA_CLOAKED,
-                            &cloaked,
-                            sizeof(UInt32)
-                            );
-                        if (hr.Succeeded && cloaked == PInvoke.DWM_CLOAKED_SHELL)
-                            return false;
-
-                        if (string.IsNullOrWhiteSpace(x.Title))
-                            return false;
-
-                        return true;
-                    });
+                    .Where(x => x._CheckIsAltTabWindow(shellWindow));
             }
         }
     }
