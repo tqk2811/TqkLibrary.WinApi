@@ -366,7 +366,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             if (this.GetAncestor(GetAncestorFlags.GA_ROOT) != this)
                 return false;
 
-            int style = PInvoke.GetWindowLong((HWND)x.WindowHandle, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
+            int style = PInvoke.GetWindowLong((HWND)this.WindowHandle, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
             if (!((style & WS_DISABLED) != WS_DISABLED))
                 return false;
             if ((style & WS_EX_TOOLWINDOW) != 0)
