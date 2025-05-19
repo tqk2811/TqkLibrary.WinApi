@@ -189,8 +189,8 @@ namespace TqkLibrary.WinApi.FindWindowHelper
                     {
                         yield return new WindowHelper(item);
                     }
-                };
             }
+        }
         }
 
         /// <summary>
@@ -203,8 +203,8 @@ namespace TqkLibrary.WinApi.FindWindowHelper
                 foreach (HWND item in ((HWND)WindowHandle).GetChildWindows())
                 {
                     yield return new WindowHelper(item);
-                };
             }
+        }
         }
 
         /// <summary>
