@@ -46,6 +46,7 @@ SetWindowText
 GetTopWindow
 GetAncestor
 GetShellWindow
+ShowWindow
 
 EnumDisplayMonitors
 GetMonitorInfo

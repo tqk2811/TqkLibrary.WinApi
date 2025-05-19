@@ -189,8 +189,8 @@ namespace TqkLibrary.WinApi.FindWindowHelper
                     {
                         yield return new WindowHelper(item);
                     }
+                }
             }
-        }
         }
 
         /// <summary>
@@ -203,8 +203,8 @@ namespace TqkLibrary.WinApi.FindWindowHelper
                 foreach (HWND item in ((HWND)WindowHandle).GetChildWindows())
                 {
                     yield return new WindowHelper(item);
+                }
             }
-        }
         }
 
         /// <summary>
@@ -322,6 +322,39 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             return PInvoke.SetWindowText((HWND)WindowHandle, text);
         }
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+        public enum SHOW_WINDOW_CMD
+        {
+            SW_HIDE = 0,
+            SW_SHOWNORMAL = 1,
+            SW_NORMAL = 1,
+            SW_SHOWMINIMIZED = 2,
+            SW_SHOWMAXIMIZED = 3,
+            SW_MAXIMIZE = 3,
+            SW_SHOWNOACTIVATE = 4,
+            SW_SHOW = 5,
+            SW_MINIMIZE = 6,
+            SW_SHOWMINNOACTIVE = 7,
+            SW_SHOWNA = 8,
+            SW_RESTORE = 9,
+            SW_SHOWDEFAULT = 10,
+            SW_FORCEMINIMIZE = 11,
+            SW_MAX = 11,
+        }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+        /// <summary>
+        /// Sets the specified window's show state.
+        /// </summary>
+        /// <param name="nCmdShow">Controls how the window is to be shown. This parameter is ignored the first time an application calls ShowWindow, if the program that launched the application provides a STARTUPINFO structure. Otherwise, the first time ShowWindow is called, the value should be the value obtained by the WinMain function in its nCmdShow parameter. In subsequent calls, this parameter can be one of the following values.</param>
+        /// <returns></returns>
+        public bool ShowWindow(SHOW_WINDOW_CMD nCmdShow)
+        {
+            return PInvoke.ShowWindow((HWND)WindowHandle, (Windows.Win32.UI.WindowsAndMessaging.SHOW_WINDOW_CMD)nCmdShow);
+        }
+
+
+
 
 
         /// <summary>
