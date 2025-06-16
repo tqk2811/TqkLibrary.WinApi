@@ -175,5 +175,13 @@ namespace TqkLibrary.WinApi.FindWindowHelper
                     .ToList();
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public static IEnumerable<ProcessHelper> GetProcessesByName(string name)
+            => System.Diagnostics.Process.GetProcessesByName(name)
+                .Select(x => new ProcessHelper((uint)x.Id));
+
     }
 }
