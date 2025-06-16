@@ -166,13 +166,12 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
-        public static IReadOnlyList<ProcessHelper> AllProcesses
+        public static IEnumerable<ProcessHelper> AllProcesses
         {
             get
             {
                 return System.Diagnostics.Process.GetProcesses()
-                    .Select(x => new ProcessHelper((uint)x.Id))
-                    .ToList();
+                    .Select(x => new ProcessHelper((uint)x.Id));
             }
         }
 
