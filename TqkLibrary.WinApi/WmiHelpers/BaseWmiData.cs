@@ -18,7 +18,7 @@ namespace TqkLibrary.WinApi.WmiHelpers
     {
         static readonly Regex regex_windowDateTime = new Regex("(\\d{14}\\.\\d{6})([+-]{1}\\d+)$");
 
-        static readonly IReadOnlyDictionary<Type, Func<object, PropertyInfo, object, bool>> dict_Win32_Process
+        static readonly IReadOnlyDictionary<Type, Func<object, PropertyInfo, object, bool>> dict_ParseHelpers
             = new Dictionary<Type, Func<object, PropertyInfo, object, bool>>()
         {
             {
@@ -96,9 +96,9 @@ namespace TqkLibrary.WinApi.WmiHelpers
                                     }
                                 }
                             }
-                            if (dict_Win32_Process.ContainsKey(propertyInfo.PropertyType))
+                            if (dict_ParseHelpers.ContainsKey(propertyInfo.PropertyType))
                             {
-                                if (dict_Win32_Process[propertyInfo.PropertyType].Invoke(this, propertyInfo, value))
+                                if (dict_ParseHelpers[propertyInfo.PropertyType].Invoke(this, propertyInfo, value))
                                 {
                                     continue;
                                 }
