@@ -14,15 +14,6 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="windowHandle"></param>
-        public WindowHelper(IntPtr windowHandle)
-        {
-            WindowHandle = windowHandle;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public IntPtr WindowHandle { get; }
 
         /// <summary>
@@ -226,35 +217,18 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         }
 
 
+
+
         /// <summary>
         /// 
         /// </summary>
-        public enum GetAncestorFlags : uint
+        /// <param name="windowHandle"></param>
+        public WindowHelper(IntPtr windowHandle)
         {
-            /// <summary>
-            /// Retrieves the parent window. This does not include the owner, as it does with the <see cref="ParentWindow"/> function.
-            /// </summary>
-            GA_PARENT = 1U,
-            /// <summary>
-            /// Retrieves the root window by walking the chain of parent windows.
-            /// </summary>
-            GA_ROOT = 2U,
-            /// <summary>
-            /// Retrieves the owned root window by walking the chain of parent and owner windows returned by <see cref="ParentWindow"/>.
-            /// </summary>
-            GA_ROOTOWNER = 3U,
+            WindowHandle = windowHandle;
         }
-        /// <summary>
-        /// Retrieves the handle to the ancestor of the specified window.
-        /// </summary>
-        /// <param name="getAncestorFlags">The ancestor to be retrieved. This parameter can be one of the following values.</param>
-        /// <returns>The return value is the handle to the ancestor window.</returns>
-        public WindowHelper? GetAncestor(GetAncestorFlags getAncestorFlags)
-        {
-            IntPtr handle = PInvoke.GetAncestor((HWND)WindowHandle, (GET_ANCESTOR_FLAGS)getAncestorFlags);
-            if (handle == IntPtr.Zero) return null;
-            return new WindowHelper(handle);
-        }
+
+
 
 
         /// <summary>
@@ -288,6 +262,43 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             return $"{nameof(WindowHandle)}:{WindowHandle}, {nameof(Title)}: '{Title}', {nameof(ClassName)}: '{ClassName}'";
         }
+
+
+
+
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public enum GetAncestorFlags : uint
+        {
+            /// <summary>
+            /// Retrieves the parent window. This does not include the owner, as it does with the <see cref="ParentWindow"/> function.
+            /// </summary>
+            GA_PARENT = 1U,
+            /// <summary>
+            /// Retrieves the root window by walking the chain of parent windows.
+            /// </summary>
+            GA_ROOT = 2U,
+            /// <summary>
+            /// Retrieves the owned root window by walking the chain of parent and owner windows returned by <see cref="ParentWindow"/>.
+            /// </summary>
+            GA_ROOTOWNER = 3U,
+        }
+        /// <summary>
+        /// Retrieves the handle to the ancestor of the specified window.
+        /// </summary>
+        /// <param name="getAncestorFlags">The ancestor to be retrieved. This parameter can be one of the following values.</param>
+        /// <returns>The return value is the handle to the ancestor window.</returns>
+        public WindowHelper? GetAncestor(GetAncestorFlags getAncestorFlags)
+        {
+            IntPtr handle = PInvoke.GetAncestor((HWND)WindowHandle, (GET_ANCESTOR_FLAGS)getAncestorFlags);
+            if (handle == IntPtr.Zero) return null;
+            return new WindowHelper(handle);
+        }
+
+
 
         /// <summary>
         /// 
@@ -356,7 +367,7 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
-        public bool IsAltTabWindow => _CheckIsAltTabWindow(GetShellWindow());
+        public bool IsAltTabWindow => _CheckIsAltTabWindow(ShellWindow);
         unsafe bool _CheckIsAltTabWindow(WindowHelper shellWindow)
         {
             if (this == shellWindow)
@@ -389,6 +400,15 @@ namespace TqkLibrary.WinApi.FindWindowHelper
 
             return true;
         }
+
+
+
+
+
+
+
+
+
 
 
         /// <summary>
@@ -439,42 +459,33 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// 
         /// </summary>
         /// <returns></returns>
-        public static WindowHelper? GetFocusWindow()
+        public static WindowHelper? FocusWindow
         {
-            HWND hwnd = PInvoke.GetFocus();
-            if (hwnd.IsNull) return null;
-            return new WindowHelper(hwnd);
+            get
+            {
+                HWND hwnd = PInvoke.GetFocus();
+                if (hwnd.IsNull) return null;
+                return new WindowHelper(hwnd);
+            }
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public static WindowHelper? GetActiveWindow()
+        public static WindowHelper? ActiveWindow
         {
-            HWND hwnd = PInvoke.GetActiveWindow();
-            if (hwnd.IsNull) return null;
-            return new WindowHelper(hwnd);
+            get
+            {
+                HWND hwnd = PInvoke.GetActiveWindow();
+                if (hwnd.IsNull) return null;
+                return new WindowHelper(hwnd);
+            }
         }
-
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
-        public static WindowHelper? GetWindowFromPoint(Point point)
-        {
-            HWND hwnd = PInvoke.WindowFromPoint(point);
-            if (hwnd.IsNull) return null;
-            return new WindowHelper(hwnd);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public static WindowHelper GetShellWindow() => new WindowHelper(PInvoke.GetShellWindow());
-
-
+        public static WindowHelper ShellWindow => new WindowHelper(PInvoke.GetShellWindow());
 
         const int WS_DISABLED = 0x08000000;
         const int WS_EX_TOOLWINDOW = 0x00000080;
@@ -486,10 +497,22 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         {
             get
             {
-                WindowHelper shellWindow = GetShellWindow();
-                return AllWindows
-                    .Where(x => x._CheckIsAltTabWindow(shellWindow));
+                WindowHelper shellWindow = ShellWindow;
+                return AllWindows.Where(x => x._CheckIsAltTabWindow(shellWindow));
             }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public static WindowHelper? GetWindowFromPoint(Point point)
+        {
+            HWND hwnd = PInvoke.WindowFromPoint(point);
+            if (hwnd.IsNull) return null;
+            return new WindowHelper(hwnd);
         }
     }
 }
