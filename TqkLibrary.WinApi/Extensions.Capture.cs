@@ -48,12 +48,12 @@ namespace TqkLibrary.WinApi
                             try
                             {
                                 hdcSrc = PInvoke.GetWindowDC((HWND)intPtr);
-                                if (hdcSrc == 0)
+                                if (hdcSrc == IntPtr.Zero)
                                     return null;
 
                                 // create a device context we can copy to
                                 hdcDest = PInvoke.CreateCompatibleDC(hdcSrc);
-                                if (hdcDest == 0)
+                                if (hdcDest == IntPtr.Zero)
                                     return null;
 
                                 // create a bitmap we can copy it to,
