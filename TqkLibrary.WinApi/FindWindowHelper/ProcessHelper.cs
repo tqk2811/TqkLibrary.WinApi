@@ -93,6 +93,23 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <summary>
         /// 
         /// </summary>
+        public string Name
+        {
+            get
+            {
+                var _ProcessImageName = ProcessImageName;
+                if (File.Exists(_ProcessImageName))
+                {
+                    return new FileInfo(_ProcessImageName).Name;
+                }
+                return string.Empty;
+            }
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
         public uint ProcessId { get; }
 
         /// <summary>
@@ -223,12 +240,8 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             {
                 new Tuple<string, string>(nameof(ProcessId),ProcessId.ToString()),
                 new Tuple<string, string>(nameof(IsAlive),IsAlive.ToString()),
+                new Tuple<string, string>(nameof(Name),Name),
             };
-            var _ProcessImageName = ProcessImageName;
-            if (File.Exists(_ProcessImageName))
-            {
-                tuples.Add(new Tuple<string, string>("Name", new FileInfo(_ProcessImageName).Name));
-            }
             return string.Join(",", tuples.Select(x => $"{x.Item1}: {x.Item2}"));
         }
 
