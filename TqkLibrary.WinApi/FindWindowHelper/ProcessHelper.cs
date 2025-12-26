@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
@@ -29,6 +31,64 @@ namespace TqkLibrary.WinApi.FindWindowHelper
             ProcessId = (uint)processId;
         }
 
+        const uint STILL_ACTIVE = 259;
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool IsAlive
+        {
+            get
+            {
+                using SafeHandle safeHandle = GetProcessHandle(PROCESS_ACCESS_RIGHTS.PROCESS_QUERY_LIMITED_INFORMATION);
+                if (safeHandle.IsInvalid) return false;
+                if (PInvoke.GetExitCodeProcess(safeHandle, out uint exitcode))
+                {
+                    return exitcode == STILL_ACTIVE;
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ProcessImageName
+        {
+            get
+            {
+                using SafeHandle safeHandle = GetProcessHandle(PROCESS_ACCESS_RIGHTS.PROCESS_QUERY_LIMITED_INFORMATION);
+                uint bufferSize = 260;
+                char[] buffer = ArrayPool<char>.Shared.Rent((int)bufferSize);
+                try
+                {
+                    while (bufferSize <= 32768)
+                    {
+                        uint actualSize = (uint)buffer.Length;
+                        if (PInvoke.QueryFullProcessImageName(safeHandle, PROCESS_NAME_FORMAT.PROCESS_NAME_WIN32, buffer, ref actualSize))
+                        {
+                            return new string(buffer, 0, (int)actualSize);
+                        }
+
+                        int error = Marshal.GetLastWin32Error();
+                        if (error == (int)WIN32_ERROR.ERROR_INSUFFICIENT_BUFFER)
+                        {
+                            bufferSize *= 2;
+                            ArrayPool<char>.Shared.Return(buffer);
+                            buffer = ArrayPool<char>.Shared.Rent((int)bufferSize);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+                finally
+                {
+                    ArrayPool<char>.Shared.Return(buffer);
+                }
+                return string.Empty;
+            }
+        }
 
         /// <summary>
         /// 
@@ -159,7 +219,17 @@ namespace TqkLibrary.WinApi.FindWindowHelper
         /// <returns></returns>
         public override string ToString()
         {
-            return $"{nameof(ProcessId)}: {ProcessId}";
+            List<Tuple<string, string>> tuples = new List<Tuple<string, string>>()
+            {
+                new Tuple<string, string>(nameof(ProcessId),ProcessId.ToString()),
+                new Tuple<string, string>(nameof(IsAlive),IsAlive.ToString()),
+            };
+            var _ProcessImageName = ProcessImageName;
+            if (File.Exists(_ProcessImageName))
+            {
+                tuples.Add(new Tuple<string, string>("Name", new FileInfo(_ProcessImageName).Name));
+            }
+            return string.Join(",", tuples.Select(x => $"{x.Item1}: {x.Item2}"));
         }
 
 

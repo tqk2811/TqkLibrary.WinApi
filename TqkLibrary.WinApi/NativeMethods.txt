@@ -47,6 +47,9 @@ GetTopWindow
 GetAncestor
 GetShellWindow
 ShowWindow
+GetExitCodeProcess
+QueryFullProcessImageName
+
 
 EnumDisplayMonitors
 GetMonitorInfo
@@ -90,3 +93,4 @@ VK_OEM_PERIOD
 VK_DIVIDE
 VK_CAPITAL
 
+STILL_ACTIVE
