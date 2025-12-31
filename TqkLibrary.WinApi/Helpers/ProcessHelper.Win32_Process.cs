@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using TqkLibrary.WinApi.WmiHelpers;
 
-namespace TqkLibrary.WinApi.FindWindowHelper
+namespace TqkLibrary.WinApi.Helpers
 {
     public partial class ProcessHelper
     {

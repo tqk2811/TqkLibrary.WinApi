@@ -7,7 +7,7 @@ using System.Linq;
 using System.Management;
 using System.Runtime.InteropServices;
 
-namespace TqkLibrary.WinApi.FindWindowHelper
+namespace TqkLibrary.WinApi.Helpers
 {
     /// <summary>
     /// 
