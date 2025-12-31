@@ -73,7 +73,7 @@ namespace TqkLibrary.WinApi.WmiHelpers
                             if (value_type.Equals(propertyInfo.PropertyType))
                             {
                                 propertyInfo.SetValue(this, value);
-                                continue;
+                                break;
                             }
                             else
                             {
@@ -86,13 +86,13 @@ namespace TqkLibrary.WinApi.WmiHelpers
                                         if (value_type.Equals(NullableUnderlyingType))
                                         {
                                             propertyInfo.SetValue(this, value);
-                                            continue;
+                                            break;
                                         }
                                     }
                                     else if (typeof(IEnumerable).IsAssignableFrom(propertyInfo.PropertyType) && propertyInfo.PropertyType.IsInterface)//Array
                                     {
                                         propertyInfo.SetValue(this, value);
-                                        continue;
+                                        break;
                                     }
                                 }
                             }
@@ -100,7 +100,7 @@ namespace TqkLibrary.WinApi.WmiHelpers
                             {
                                 if (dict_ParseHelpers[propertyInfo.PropertyType].Invoke(this, propertyInfo, value))
                                 {
-                                    continue;
+                                    break;
                                 }
                             }
 
