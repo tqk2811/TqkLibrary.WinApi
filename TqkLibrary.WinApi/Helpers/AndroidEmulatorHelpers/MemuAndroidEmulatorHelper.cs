@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TqkLibrary.WinApi.Enums;
 
-namespace TqkLibrary.WinApi.HandleControls
+namespace TqkLibrary.WinApi.Helpers.AndroidEmulatorHelpers
 {
     /// <summary>
     /// 
