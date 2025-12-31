@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
-using TqkLibrary.WinApi.FindWindowHelper;
+using TqkLibrary.WinApi.Helpers;
 using TqkLibrary.WinApi.HookEvents;
 
 namespace TqkLibrary.WinApi

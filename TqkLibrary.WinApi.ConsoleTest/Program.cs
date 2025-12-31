@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TqkLibrary.WinApi.Enums;
-using TqkLibrary.WinApi.FindWindowHelper;
+using TqkLibrary.WinApi.Helpers;
 using TqkLibrary.WinApi.HandleControls;
 using TqkLibrary.WinApi.WmiHelpers;
 
