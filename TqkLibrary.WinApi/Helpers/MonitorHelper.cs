@@ -14,7 +14,20 @@ namespace TqkLibrary.WinApi.Helpers
     /// </summary>
     public static class MonitorHelper
     {
-        internal unsafe static IEnumerable<HMONITOR> Monitors
+        /// <summary>
+        /// 
+        /// </summary>
+        public static IEnumerable<IntPtr> Monitors
+        {
+            get
+            {
+                foreach(var hmonitor in HMonitors)
+                {
+                    yield return hmonitor;
+                }
+            }
+        }
+        internal unsafe static IEnumerable<HMONITOR> HMonitors
         {
             get
             {
@@ -79,7 +92,7 @@ namespace TqkLibrary.WinApi.Helpers
         /// <returns></returns>
         public static (Size, Point) GetLocationApp(int position, int rows = 2, int cols = 2, float? appScale = null, bool isChrome = false)
         {
-            var monitors = MonitorHelper.Monitors.ToList();
+            var monitors = MonitorHelper.HMonitors.ToList();
             var monitorsInfo = monitors.GetMonitorsInfo().ToList();
 
             int screenIndex = position / (rows * cols) % monitors.Count();
