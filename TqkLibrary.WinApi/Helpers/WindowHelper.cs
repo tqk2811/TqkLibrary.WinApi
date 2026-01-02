@@ -42,14 +42,14 @@ namespace TqkLibrary.WinApi.Helpers
             get
             {
                 //window title 
-                int maxLength = PInvoke.GetWindowTextLength((HWND)WindowHandle);
+                int maxLength = PInvoke.GetWindowTextLength(HWND);
                 if (maxLength > 0)
                 {
                     char[] text = new char[maxLength + 1];
                     int finalLength = 0;
                     fixed (char* textPtr = text)
                     {
-                        finalLength = PInvoke.GetWindowText((HWND)WindowHandle, textPtr, maxLength + 1);
+                        finalLength = PInvoke.GetWindowText(HWND, textPtr, maxLength + 1);
                         if (finalLength > 0)
                         {
                             return new string(text, 0, finalLength);
@@ -89,7 +89,7 @@ namespace TqkLibrary.WinApi.Helpers
                 int finalLength = 0;
                 fixed (char* textPtr = text)
                 {
-                    finalLength = PInvoke.GetClassName((HWND)WindowHandle, textPtr, text.Length);
+                    finalLength = PInvoke.GetClassName(HWND, textPtr, text.Length);
                     if (finalLength == 0)
                     {
                         return string.Empty;
@@ -106,7 +106,7 @@ namespace TqkLibrary.WinApi.Helpers
         {
             get
             {
-                return PInvoke.IsWindowVisible((HWND)WindowHandle);
+                return PInvoke.IsWindowVisible(HWND);
             }
         }
 
@@ -117,7 +117,7 @@ namespace TqkLibrary.WinApi.Helpers
         {
             get
             {
-                return PInvoke.IsWindowUnicode((HWND)WindowHandle);
+                return PInvoke.IsWindowUnicode(HWND);
             }
         }
 
@@ -128,7 +128,7 @@ namespace TqkLibrary.WinApi.Helpers
         {
             get
             {
-                return PInvoke.IsWindow((HWND)WindowHandle);
+                return PInvoke.IsWindow(HWND);
             }
         }
 
@@ -139,7 +139,7 @@ namespace TqkLibrary.WinApi.Helpers
         {
             get
             {
-                return PInvoke.IsIconic((HWND)WindowHandle);
+                return PInvoke.IsIconic(HWND);
             }
         }
 
@@ -150,7 +150,7 @@ namespace TqkLibrary.WinApi.Helpers
         {
             get
             {
-                IntPtr handle = PInvoke.GetTopWindow((HWND)WindowHandle);
+                IntPtr handle = PInvoke.GetTopWindow(HWND);
                 if (handle == IntPtr.Zero) return null;
                 return new WindowHelper(handle);
             }
@@ -163,7 +163,7 @@ namespace TqkLibrary.WinApi.Helpers
         {
             get
             {
-                IntPtr handle = PInvoke.GetParent((HWND)WindowHandle);
+                IntPtr handle = PInvoke.GetParent(HWND);
                 if (handle == IntPtr.Zero) return null;
                 return new WindowHelper(handle);
             }
@@ -176,7 +176,7 @@ namespace TqkLibrary.WinApi.Helpers
         {
             get
             {
-                foreach (HWND item in ((HWND)WindowHandle).GetChildWindows())
+                foreach (HWND item in HWND.GetChildWindows())
                 {
                     IntPtr handle = PInvoke.GetParent(item);
                     if (handle == WindowHandle)
@@ -194,7 +194,7 @@ namespace TqkLibrary.WinApi.Helpers
         {
             get
             {
-                foreach (HWND item in ((HWND)WindowHandle).GetChildWindows())
+                foreach (HWND item in HWND.GetChildWindows())
                 {
                     yield return new WindowHelper(item);
                 }
@@ -210,7 +210,7 @@ namespace TqkLibrary.WinApi.Helpers
             {
                 //System.win
                 uint ProcessId = 0;
-                uint res = PInvoke.GetWindowThreadProcessId((HWND)WindowHandle, &ProcessId);
+                uint res = PInvoke.GetWindowThreadProcessId(HWND, &ProcessId);
                 if (res != 0)
                 {
                     return new ProcessHelper(ProcessId);
@@ -296,7 +296,7 @@ namespace TqkLibrary.WinApi.Helpers
         /// <returns>The return value is the handle to the ancestor window.</returns>
         public WindowHelper? GetAncestor(GetAncestorFlags getAncestorFlags)
         {
-            IntPtr handle = PInvoke.GetAncestor((HWND)WindowHandle, (GET_ANCESTOR_FLAGS)getAncestorFlags);
+            IntPtr handle = PInvoke.GetAncestor(HWND, (GET_ANCESTOR_FLAGS)getAncestorFlags);
             if (handle == IntPtr.Zero) return null;
             return new WindowHelper(handle);
         }
@@ -312,7 +312,7 @@ namespace TqkLibrary.WinApi.Helpers
         /// <returns></returns>
         public nint SendMessage(uint msg, nuint wParam, nint lParam)
         {
-            return PInvoke.SendMessage((HWND)WindowHandle, msg, (WPARAM)wParam, (LPARAM)lParam);
+            return PInvoke.SendMessage(HWND, msg, (WPARAM)wParam, (LPARAM)lParam);
         }
 
         /// <summary>
@@ -324,7 +324,7 @@ namespace TqkLibrary.WinApi.Helpers
         /// <returns></returns>
         public nint PostMessage(uint msg, nuint wParam, nint lParam)
         {
-            return PInvoke.PostMessage((HWND)WindowHandle, msg, (WPARAM)wParam, (LPARAM)lParam);
+            return PInvoke.PostMessage(HWND, msg, (WPARAM)wParam, (LPARAM)lParam);
         }
 
         /// <summary>
@@ -334,7 +334,7 @@ namespace TqkLibrary.WinApi.Helpers
         /// <returns></returns>
         public bool SetWindowText(string text)
         {
-            return PInvoke.SetWindowText((HWND)WindowHandle, text);
+            return PInvoke.SetWindowText(HWND, text);
         }
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -364,7 +364,7 @@ namespace TqkLibrary.WinApi.Helpers
         /// <returns></returns>
         public bool ShowWindow(SHOW_WINDOW_CMD nCmdShow)
         {
-            return PInvoke.ShowWindow((HWND)WindowHandle, (Windows.Win32.UI.WindowsAndMessaging.SHOW_WINDOW_CMD)nCmdShow);
+            return PInvoke.ShowWindow(HWND, (Windows.Win32.UI.WindowsAndMessaging.SHOW_WINDOW_CMD)nCmdShow);
         }
 
         /// <summary>
