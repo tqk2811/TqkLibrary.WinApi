@@ -129,6 +129,17 @@ namespace TqkLibrary.WinApi.Helpers
         /// <summary>
         /// 
         /// </summary>
+        public IEnumerable<WindowHelper> AltTabWindows
+        {
+            get
+            {
+                return AllWindows.Where(x => x.IsAltTabWindow);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public IEnumerable<WindowHelper> WindowsTree
         {
             get
