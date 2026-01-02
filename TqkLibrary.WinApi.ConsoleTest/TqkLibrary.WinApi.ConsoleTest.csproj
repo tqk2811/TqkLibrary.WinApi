@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0-windows10.0.17763.0;net8.0-windows10.0.17763.0</TargetFrameworks>
+		<TargetFrameworks>net8.0-windows10.0.17763.0</TargetFrameworks>
 		<LangVersion>12.0</LangVersion>
 		<Platforms>AnyCPU;x64;x86</Platforms>
 		<!--<UseWPF>true</UseWPF>-->
@@ -15,11 +15,17 @@
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<Nullable>enable</Nullable>
 		<OutputType>Exe</OutputType>
+		<Configurations>Debug;Release;RemoteDebug</Configurations>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(Configuration) == 'RemoteDebug'">
+		<DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+		<BaseOutputPath>\\TestEmulator\Csharp\TqkLibrary.WinApi.ConsoleTest</BaseOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\TqkLibrary.WinApi\TqkLibrary.WinApi.csproj" />
+		<ProjectReference Include="..\TqkLibrary.WinApi\TqkLibrary.WinApi.csproj" />
 	</ItemGroup>
-	
-	
+
+
 </Project>

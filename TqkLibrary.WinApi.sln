@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31612.314
+# Visual Studio Version 18
+VisualStudioVersion = 18.1.11312.151 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TqkLibrary.WinApi", "TqkLibrary.WinApi\TqkLibrary.WinApi.csproj", "{E8EB444E-3C07-4CF2-9B01-D2C32FA6D3E3}"
 EndProject
@@ -19,6 +19,9 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
+		RemoteDebug|Any CPU = RemoteDebug|Any CPU
+		RemoteDebug|x64 = RemoteDebug|x64
+		RemoteDebug|x86 = RemoteDebug|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{E8EB444E-3C07-4CF2-9B01-D2C32FA6D3E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -33,6 +36,12 @@ Global
 		{E8EB444E-3C07-4CF2-9B01-D2C32FA6D3E3}.Release|x64.Build.0 = Release|Any CPU
 		{E8EB444E-3C07-4CF2-9B01-D2C32FA6D3E3}.Release|x86.ActiveCfg = Release|Any CPU
 		{E8EB444E-3C07-4CF2-9B01-D2C32FA6D3E3}.Release|x86.Build.0 = Release|Any CPU
+		{E8EB444E-3C07-4CF2-9B01-D2C32FA6D3E3}.RemoteDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8EB444E-3C07-4CF2-9B01-D2C32FA6D3E3}.RemoteDebug|Any CPU.Build.0 = Debug|Any CPU
+		{E8EB444E-3C07-4CF2-9B01-D2C32FA6D3E3}.RemoteDebug|x64.ActiveCfg = Debug|x64
+		{E8EB444E-3C07-4CF2-9B01-D2C32FA6D3E3}.RemoteDebug|x64.Build.0 = Debug|x64
+		{E8EB444E-3C07-4CF2-9B01-D2C32FA6D3E3}.RemoteDebug|x86.ActiveCfg = Debug|x86
+		{E8EB444E-3C07-4CF2-9B01-D2C32FA6D3E3}.RemoteDebug|x86.Build.0 = Debug|x86
 		{1DB1B26B-C2FC-450E-BEDC-15A4AB401DC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1DB1B26B-C2FC-450E-BEDC-15A4AB401DC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DB1B26B-C2FC-450E-BEDC-15A4AB401DC6}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -45,6 +54,9 @@ Global
 		{1DB1B26B-C2FC-450E-BEDC-15A4AB401DC6}.Release|x64.Build.0 = Release|Any CPU
 		{1DB1B26B-C2FC-450E-BEDC-15A4AB401DC6}.Release|x86.ActiveCfg = Release|Any CPU
 		{1DB1B26B-C2FC-450E-BEDC-15A4AB401DC6}.Release|x86.Build.0 = Release|Any CPU
+		{1DB1B26B-C2FC-450E-BEDC-15A4AB401DC6}.RemoteDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DB1B26B-C2FC-450E-BEDC-15A4AB401DC6}.RemoteDebug|x64.ActiveCfg = Debug|Any CPU
+		{1DB1B26B-C2FC-450E-BEDC-15A4AB401DC6}.RemoteDebug|x86.ActiveCfg = Debug|Any CPU
 		{B29D4E31-DBC0-4DD1-BE78-1C2B51DE8F2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B29D4E31-DBC0-4DD1-BE78-1C2B51DE8F2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B29D4E31-DBC0-4DD1-BE78-1C2B51DE8F2A}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -57,6 +69,12 @@ Global
 		{B29D4E31-DBC0-4DD1-BE78-1C2B51DE8F2A}.Release|x64.Build.0 = Release|Any CPU
 		{B29D4E31-DBC0-4DD1-BE78-1C2B51DE8F2A}.Release|x86.ActiveCfg = Release|Any CPU
 		{B29D4E31-DBC0-4DD1-BE78-1C2B51DE8F2A}.Release|x86.Build.0 = Release|Any CPU
+		{B29D4E31-DBC0-4DD1-BE78-1C2B51DE8F2A}.RemoteDebug|Any CPU.ActiveCfg = RemoteDebug|Any CPU
+		{B29D4E31-DBC0-4DD1-BE78-1C2B51DE8F2A}.RemoteDebug|Any CPU.Build.0 = RemoteDebug|Any CPU
+		{B29D4E31-DBC0-4DD1-BE78-1C2B51DE8F2A}.RemoteDebug|x64.ActiveCfg = RemoteDebug|x64
+		{B29D4E31-DBC0-4DD1-BE78-1C2B51DE8F2A}.RemoteDebug|x64.Build.0 = RemoteDebug|x64
+		{B29D4E31-DBC0-4DD1-BE78-1C2B51DE8F2A}.RemoteDebug|x86.ActiveCfg = RemoteDebug|x86
+		{B29D4E31-DBC0-4DD1-BE78-1C2B51DE8F2A}.RemoteDebug|x86.Build.0 = RemoteDebug|x86
 		{9AC30C7E-7563-4777-B842-60311A27C861}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9AC30C7E-7563-4777-B842-60311A27C861}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AC30C7E-7563-4777-B842-60311A27C861}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -69,6 +87,12 @@ Global
 		{9AC30C7E-7563-4777-B842-60311A27C861}.Release|x64.Build.0 = Release|Any CPU
 		{9AC30C7E-7563-4777-B842-60311A27C861}.Release|x86.ActiveCfg = Release|Any CPU
 		{9AC30C7E-7563-4777-B842-60311A27C861}.Release|x86.Build.0 = Release|Any CPU
+		{9AC30C7E-7563-4777-B842-60311A27C861}.RemoteDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AC30C7E-7563-4777-B842-60311A27C861}.RemoteDebug|Any CPU.Build.0 = Debug|Any CPU
+		{9AC30C7E-7563-4777-B842-60311A27C861}.RemoteDebug|x64.ActiveCfg = Debug|Any CPU
+		{9AC30C7E-7563-4777-B842-60311A27C861}.RemoteDebug|x64.Build.0 = Debug|Any CPU
+		{9AC30C7E-7563-4777-B842-60311A27C861}.RemoteDebug|x86.ActiveCfg = Debug|Any CPU
+		{9AC30C7E-7563-4777-B842-60311A27C861}.RemoteDebug|x86.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
