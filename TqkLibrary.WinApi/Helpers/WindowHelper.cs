@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using Windows.Win32.Graphics.Dwm;
 
 namespace TqkLibrary.WinApi.Helpers
 {
@@ -30,9 +31,9 @@ namespace TqkLibrary.WinApi.Helpers
             if (PInvoke.GetWindowRect(HWND, out rect))
             {
                 return new global::System.Drawing.Rectangle(rect.left, rect.top, rect.Width, rect.Height);
-                }
-                return null;
             }
+            return null;
+        }
 
         /// <summary>
         /// 
@@ -374,33 +375,36 @@ namespace TqkLibrary.WinApi.Helpers
         public bool IsAltTabWindow => _CheckIsAltTabWindow(ShellWindow);
         unsafe bool _CheckIsAltTabWindow(WindowHelper shellWindow)
         {
-            if (this == shellWindow)
-                return false;
-            if (!this.IsWindowVisible)
-                return false;
-            if (this.GetAncestor(GetAncestorFlags.GA_ROOT) != this)
-                return false;
+            if (this == shellWindow) return false;
+            if (!this.IsWindowVisible) return false;
 
-            int style = PInvoke.GetWindowLong((HWND)this.WindowHandle, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
-            if (!((style & WS_DISABLED) != WS_DISABLED))
-                return false;
-            if ((style & WS_EX_TOOLWINDOW) != 0)
-                return false;
-            if ((style & WS_EX_APPWINDOW) != WS_EX_APPWINDOW)
-                return false;
 
+            // 1. Kiểm tra Cloaked (Dành cho các ứng dụng Universal App/Virtual Desktops)
             UInt32 cloaked = 0;
-            HRESULT hr = PInvoke.DwmGetWindowAttribute(
-                (HWND)this.WindowHandle,
-                Windows.Win32.Graphics.Dwm.DWMWINDOWATTRIBUTE.DWMWA_CLOAKED,
-                &cloaked,
-                sizeof(UInt32)
-                );
-            if (hr.Succeeded && cloaked == PInvoke.DWM_CLOAKED_SHELL)
-                return false;
+            HRESULT hr = PInvoke.DwmGetWindowAttribute(this.HWND, DWMWINDOWATTRIBUTE.DWMWA_CLOAKED, &cloaked, sizeof(UInt32));
+            // Nếu cửa sổ bị Cloaked bởi Shell (đang ở Desktop khác chẳng hạn) thì ẩn
+            if (hr.Succeeded && cloaked != 0) return false;
+            if (hr.Succeeded && cloaked == PInvoke.DWM_CLOAKED_SHELL) return false;
 
-            if (string.IsNullOrWhiteSpace(this.Title))
+
+            //int style = PInvoke.GetWindowLong(hwnd, WINDOW_LONG_PTR_INDEX.GWL_STYLE);
+            int exStyle = PInvoke.GetWindowLong(this.HWND, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
+            if ((exStyle & WS_EX_TOOLWINDOW) != 0) return false;//Tool windows không bao giờ hiện trong Alt-Tab
+
+            HWND owner = PInvoke.GetWindow(this.HWND, GET_WINDOW_CMD.GW_OWNER);
+            bool isTopLevel = this.GetAncestor(GetAncestorFlags.GA_ROOT) == this;
+            bool hasAppWindow = (exStyle & (int)WS_EX_APPWINDOW) != 0;
+            if (isTopLevel)
+            {
+                if (owner != HWND.Null && !hasAppWindow) return false;
+            }
+            else
+            {
                 return false;
+            }
+
+
+            if (string.IsNullOrWhiteSpace(this.Title)) return false;
 
             return true;
         }

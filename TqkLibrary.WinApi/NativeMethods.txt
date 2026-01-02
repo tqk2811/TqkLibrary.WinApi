@@ -21,6 +21,7 @@ EnumWindows
 EnumChildWindows
 SetWindowsHookEx
 GetWindowDC
+GetWindow
 CreateCompatibleDC
 CreateCompatibleBitmap
 SelectObject
