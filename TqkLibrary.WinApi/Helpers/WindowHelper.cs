@@ -16,6 +16,8 @@ namespace TqkLibrary.WinApi.Helpers
         /// </summary>
         public IntPtr WindowHandle { get; }
 
+        internal HWND HWND { get { return new HWND(WindowHandle); } }
+
         /// <summary>
         /// 
         /// </summary>
