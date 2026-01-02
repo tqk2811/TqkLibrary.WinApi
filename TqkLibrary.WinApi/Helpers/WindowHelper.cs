@@ -21,17 +21,18 @@ namespace TqkLibrary.WinApi.Helpers
         /// <summary>
         /// 
         /// </summary>
-        public Rectangle? Area
+        public unsafe Rectangle? GetArea()
         {
-            get
+            RECT rect;
+            HRESULT hr = PInvoke.DwmGetWindowAttribute(HWND, DWMWINDOWATTRIBUTE.DWMWA_EXTENDED_FRAME_BOUNDS, &rect, (uint)sizeof(RECT));
+            if (hr.Succeeded)
+                return rect;
+            if (PInvoke.GetWindowRect(HWND, out rect))
             {
-                if (PInvoke.GetWindowRect((HWND)WindowHandle, out RECT rect))
-                {
-                    return (Rectangle)rect;
+                return new global::System.Drawing.Rectangle(rect.left, rect.top, rect.Width, rect.Height);
                 }
                 return null;
             }
-        }
 
         /// <summary>
         /// 

@@ -142,16 +142,17 @@ namespace TqkLibrary.WinApi
         {
             _synchronizationContext.Post((o) =>
             {
-                WindowHelper window = GetHoveredWindow();
-                if (window.WindowHandle == IntPtr.Zero || !window.Area.HasValue)
+                WindowHelper? window = GetHoveredWindow();
+                var area = window?.GetArea();
+                if (window is null || window.WindowHandle == IntPtr.Zero || !area.HasValue)
                 {
                     _locator?.Hide();
                     return;
                 }
                 if (_locator is not null)
                 {
-                    _locator.Location = window.Area.Value.Location;
-                    _locator.Size = window.Area.Value.Size;
+                    _locator.Location = area.Value.Location;
+                    _locator.Size = area.Value.Size;
                     _locator.TopLevel = true;
                     _locator.TopMost = true;
                     _locator.Show();
