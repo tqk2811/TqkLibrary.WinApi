@@ -63,11 +63,31 @@ namespace TqkLibrary.WinApi.Helpers.AndroidEmulatorHelpers
         /// <param name="duration"></param>
         /// <param name="step"></param>
         /// <param name="cancellationToken"></param>
-        public Task Swipe(Point from, Point to, int duration = 500, int step = 10, CancellationToken cancellationToken = default)
+        public Task SwipeAsync(Point from, Point to, int duration = 500, int step = 10, CancellationToken cancellationToken = default)
             => BindWindowHandle.ControlLSwipeAsync(new Point(from.X, from.Y - FixPosClickY), new Point(to.X, to.Y - FixPosClickY), duration, step, cancellationToken);
 
         /// <summary>
-        /// 
+        ///
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="delay"></param>
+        /// <param name="cancellationToken"></param>
+        public Task TouchAsync(Point point, int delay = 50, CancellationToken cancellationToken = default)
+            => BindWindowHandle.ControlTouchAsync(new Point(point.X, point.Y - FixPosClickY), delay, cancellationToken);
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="duration"></param>
+        /// <param name="step"></param>
+        /// <param name="cancellationToken"></param>
+        public Task TouchSwipeAsync(Point from, Point to, int duration = 500, int step = 10, CancellationToken cancellationToken = default)
+            => BindWindowHandle.ControlTouchSwipeAsync(new Point(from.X, from.Y - FixPosClickY), new Point(to.X, to.Y - FixPosClickY), duration, step, cancellationToken);
+
+        /// <summary>
+        ///
         /// </summary>
         /// <param name="text"></param>
         /// <param name="delay"></param>
