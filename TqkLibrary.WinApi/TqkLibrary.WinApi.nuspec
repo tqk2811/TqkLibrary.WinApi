@@ -3,7 +3,7 @@
 	<!--https://docs.microsoft.com/en-us/nuget/reference/nuspec-->
 	<metadata>
 		<id>$id$</id>
-		<version>1.0.0-build$buildDay$</version>
+		<version>$version$</version>
 		<description>my private lib</description>
 		<authors>tqk2811</authors>
 		<readme>docs\README.MD</readme>
@@ -41,7 +41,6 @@
 		<file src="bin\Release\**\$id$.dll" target="lib\" />
 		<file src="bin\Release\**\$id$.pdb" target="lib\" />
 		<file src="bin\Release\**\$id$.xml" target="lib\" />
-		<file src="**\*.cs" target="src\" exclude="obj\**\*.cs;bin\**\*.cs"/>
 		<file src="..\README.MD" target="docs\" />
 	</files>
 </package>
