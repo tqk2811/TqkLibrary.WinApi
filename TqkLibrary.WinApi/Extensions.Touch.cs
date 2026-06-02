@@ -8,12 +8,12 @@ namespace TqkLibrary.WinApi
 {
     public static partial class Extensions
     {
-        const uint TOUCHEVENTF_MOVE = 0x0001;
-        const uint TOUCHEVENTF_DOWN = 0x0002;
-        const uint TOUCHEVENTF_UP = 0x0004;
-        const uint TOUCHEVENTF_INRANGE = 0x0008;
-        const uint TOUCHEVENTF_PRIMARY = 0x0010;
-        const uint TOUCHINPUTMASKF_CONTACTAREA = 0x0004;
+        public const uint TOUCHEVENTF_MOVE = 0x0001;
+        public const uint TOUCHEVENTF_DOWN = 0x0002;
+        public const uint TOUCHEVENTF_UP = 0x0004;
+        public const uint TOUCHEVENTF_INRANGE = 0x0008;
+        public const uint TOUCHEVENTF_PRIMARY = 0x0010;
+        public const uint TOUCHINPUTMASKF_CONTACTAREA = 0x0004;
 
         [StructLayout(LayoutKind.Sequential)]
         private struct TOUCHINPUT
@@ -34,7 +34,14 @@ namespace TqkLibrary.WinApi
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool ClientToScreen(IntPtr hWnd, ref System.Drawing.Point lpPoint);
 
-        private static void SendWmTouch(IntPtr windowHandle, System.Drawing.Point clientPoint, uint flags, uint id = 0)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="windowHandle"></param>
+        /// <param name="clientPoint"></param>
+        /// <param name="flags">TOUCHEVENTF_*</param>
+        /// <param name="id"></param>
+        public static void SendWmTouch(IntPtr windowHandle, System.Drawing.Point clientPoint, uint flags, uint id = 0)
         {
             System.Drawing.Point screenPoint = clientPoint;
             ClientToScreen(windowHandle, ref screenPoint);
