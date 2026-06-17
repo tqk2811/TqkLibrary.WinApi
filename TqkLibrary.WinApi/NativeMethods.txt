@@ -16,6 +16,7 @@ OpenProcess
 GetWindowText
 GetWindowTextLength
 GetWindowRect
+GetClientRect
 GetWindowThreadProcessId
 EnumWindows
 EnumChildWindows
