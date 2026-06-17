@@ -8,6 +8,8 @@ using TqkLibrary.WinApi.Enums;
 using TqkLibrary.WinApi.Helpers;
 using TqkLibrary.WinApi.WmiHelpers;
 using TqkLibrary.WinApi.Helpers.AndroidEmulatorHelpers;
+using TqkLibrary.AdbDotNet.LdPlayers;
+using System.Drawing;
 
 namespace TqkLibrary.WinApi.ConsoleTest
 {
@@ -15,29 +17,29 @@ namespace TqkLibrary.WinApi.ConsoleTest
     {
         static async Task Main(string[] args)
         {
-            var list = WindowHelper.AllAltTabWindows.ToList();
-            var item = list.First();
+            //var list = WindowHelper.AllAltTabWindows.ToList();
+            //var item = list.First();
             //list[0].Area
 
 #if DEBUG
-            foreach (Win32_PnPEntity win32_PnPEntity in BaseWmiDataQueryHelper
-                .CreateQuery<Win32_PnPEntity>()
-                //.Include(x => x.Caption, x => x.Name, x => x.PNPClass)
-                .Where(x => x.PNPClass == "Image" || x.PNPClass == "Camera")
-                .Query().Where(x => x.PNPClass == "Image" || x.PNPClass == "Camera"))
-            {
+            //foreach (Win32_PnPEntity win32_PnPEntity in BaseWmiDataQueryHelper
+            //    .CreateQuery<Win32_PnPEntity>()
+            //    //.Include(x => x.Caption, x => x.Name, x => x.PNPClass)
+            //    .Where(x => x.PNPClass == "Image" || x.PNPClass == "Camera")
+            //    .Query().Where(x => x.PNPClass == "Image" || x.PNPClass == "Camera"))
+            //{
 
-            }
+            //}
 #endif
-            foreach (Win32_PnPEntity win32_PnPEntity in Win32_PnPEntity.Query())
-            {
+            //foreach (Win32_PnPEntity win32_PnPEntity in Win32_PnPEntity.Query())
+            //{
 
-            }
+            //}
 
-            foreach (ProcessHelper processHelper in Process.GetProcesses().Select(x => new ProcessHelper(x.Id)))
-            {
-                Win32_Process? win32_Process = processHelper.Query_Win32_Process();
-            }
+            //foreach (ProcessHelper processHelper in Process.GetProcesses().Select(x => new ProcessHelper(x.Id)))
+            //{
+            //    Win32_Process? win32_Process = processHelper.Query_Win32_Process();
+            //}
 
 
             //ProcessHelper rootProcessHelper = new ProcessHelper((uint)16760);
@@ -74,24 +76,53 @@ namespace TqkLibrary.WinApi.ConsoleTest
 
 
 
+            LdPlayer.LdConsolePath = @"D:\LDPlayer\LDPlayer9\ldconsole.exe";
+            var list2 = await LdPlayer.List2Async();
+            var item = list2.First(x => x.AndroidStarted);
 
-
-            IntPtr BindWindowHandle = new IntPtr(0xc077e);//BindWindowHandle
-            IntPtr TopWindowHandle = new IntPtr(0x909e0);//TopWindowHandle
-            LdPlayerAndroidEmulatorHelper ldPlayerHelper = new LdPlayerAndroidEmulatorHelper(TopWindowHandle, BindWindowHandle);
+            WindowHelper topHelper = new WindowHelper(item.TopWindowHandle);
             while (true)
             {
-                //BindWindowHandle.ControlLClick(220, 65);
-                //foreach(char c in "TeSt23")
-                //{
-                //  BindWindowHandle.SendKey(c);
-                //}
+                // toạ độ tính theo CLIENT rect của BindWindow (cửa sổ ta gửi message tới),
+                // đọc lại mỗi vòng để phản ánh khi resize -> độc lập với scale màn hình
+                GetClientRect(item.BindWindowHandle, out RECT bindClient);
+                int bw = bindClient.Right - bindClient.Left;
+                int bh = bindClient.Bottom - bindClient.Top;
 
-                //ldPlayerHelper.ScreenShot(CaptureType.BitBlt).Save("D:\\test.png");
+                int xCenter = bw / 2;
+                int y80 = (int)(bh * 0.8);
+                int y20 = (int)(bh * 0.2);
 
+                // in chẩn đoán để so sánh các hệ toạ độ ở 150% scale
+                GetWindowRect(item.BindWindowHandle, out RECT bindWin);
+                Console.WriteLine($"DPI top={GetDpiForWindow(item.TopWindowHandle)} bind={GetDpiForWindow(item.BindWindowHandle)}");
+                Console.WriteLine($"Top  windowRect = {topHelper.GetArea()}");
+                Console.WriteLine($"Bind windowRect = ({bindWin.Right - bindWin.Left} x {bindWin.Bottom - bindWin.Top})");
+                Console.WriteLine($"Bind clientRect = ({bw} x {bh})");
+                Console.WriteLine($"Swipe from ({xCenter}, {y80}) to ({xCenter}, {y20}) on BindWindow");
+
+                await item.BindWindowHandle.ControlLSwipeAsync(
+                    new Point(xCenter, y80),
+                    new Point(xCenter, y20),
+                    500,
+                    10
+                    );
                 Console.ReadLine();
             }
 
         }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        static extern bool GetClientRect(IntPtr hWnd, out RECT lpRect);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        [return: System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+        static extern bool GetWindowRect(IntPtr hWnd, out RECT lpRect);
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        static extern uint GetDpiForWindow(IntPtr hWnd);
+
+        struct RECT { public int Left, Top, Right, Bottom; }
     }
 }

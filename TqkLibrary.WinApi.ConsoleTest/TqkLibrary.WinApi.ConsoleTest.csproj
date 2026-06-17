@@ -24,6 +24,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="TqkLibrary.AdbDotNet" Version="1.0.36" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\TqkLibrary.WinApi\TqkLibrary.WinApi.csproj" />
 	</ItemGroup>
 
